@@ -2,107 +2,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Course Compass - Search Courses</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f5f5f5;
-    }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    h1 {
-      color: #333;
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    .search-section {
-      background-color: #f9f9f9;
-      padding: 20px;
-      border-radius: 5px;
-      margin-bottom: 30px;
-    }
-    .search-row {
-      display: flex;
-      gap: 20px;
-      margin-bottom: 15px;
-      align-items: center;
-    }
-    label {
-      font-weight: bold;
-      min-width: 120px;
-    }
-    input[type="text"] {
-      flex: 1;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 14px;
-    }
-    button {
-      background-color: #007bff;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    .clear-btn {
-      background-color: #6c757d;
-      margin-left: 10px;
-    }
-    .clear-btn:hover {
-      background-color: #545b62;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 12px;
-      text-align: left;
-    }
-    th {
-      background-color: #007bff;
-      color: white;
-      font-weight: bold;
-    }
-    tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
-    tr:hover {
-      background-color: #e9e9e9;
-    }
-    .no-results {
-      text-align: center;
-      padding: 20px;
-      color: #666;
-      font-style: italic;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Course Compass - Search Courses</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<div class="top-bar">
+    <div class="left-logo">
+        <img src="utd-logo.svg" alt="Logo" class="logo-img">
+    </div>
+    <div class="right-section">
+        <span class="title">Course Compass</span>
+        <a href="advanced-search.php" class="advanced-btn">Advanced Search</a>
+    </div>
+</div>
+
   <div class="container">
-    <h1>Course Compass</h1>
-    
     <div class="search-section">
-      <h2>Search Courses</h2>
+      <h2>Find a Class</h2>
       <form method="GET" action="">
         <div class="search-row">
-          <label for="search">Search:</label>
           <input type="text" id="search" name="search" 
                  placeholder="Search by course number, course name, or instructor..." 
                  value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
