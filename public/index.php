@@ -5,14 +5,30 @@
     <meta charset="UTF-8">
     <title>Course Compass - Search Courses</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
 <div class="top-bar">
-    <div class="left-logo">
-        <img src="utd-logo.svg" alt="Logo" class="logo-img">
+    <div class="left-section">
+      <span class="title">
+        <a href="/public/index.php">Course Compass</a>
+      </span>
+    </div>
+    <div class="logo">
+      <img src="utd-logo.svg" alt="Logo" class="logo-img">
     </div>
     <div class="right-section">
-        <span class="title">Course Compass</span>
+      <!-- <i class="menu material-icons">menu</i> -->
+      <div class="dropdown">
+        <div class="icon">
+          <i class="dropbtn material-icons">menu</i>
+        </div>
+        <div class="dropdown-content">
+          <a href="#">Home</a>
+          <a href="#">Admin</a>
+          <a href="#">Log Out</a>
+        </div>
+      </div>
     </div>
 </div>
 <div class="container">
