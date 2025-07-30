@@ -13,3 +13,4 @@ Thumbs.db
 # Ignore environment config files
 .env
 
+public/db.php
