@@ -52,23 +52,6 @@ body {
     white-space: nowrap;
 }
 
-.advanced-btn {
-    background-color: white;
-    color: var(--primary-color);
-    text-decoration: none;
-    padding: 8px 16px;
-    font-size: 14px;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s;
-}
-
-.advanced-btn:hover {
-    background-color: #e6e6e6;
-}
-
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -89,6 +72,29 @@ h1 {
     padding: 20px;
     border-radius: 5px;
     margin-bottom: 30px;
+}
+
+.search-title {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.adv-search-btn {
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.adv-search-btn:hover {
+    background-color: var(--primary-hover);
 }
 
 .search-row {
