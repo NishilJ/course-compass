@@ -13,22 +13,23 @@
     </div>
     <div class="right-section">
         <span class="title">Course Compass</span>
-        <a href="advanced-search.php" class="advanced-btn">Advanced Search</a>
     </div>
 </div>
-
-  <div class="container">
+<div class="container">
     <div class="search-section">
-      <h2>Find a Class</h2>
-      <form method="GET" action="">
-        <div class="search-row">
-          <input type="text" id="search" name="search" 
-                 placeholder="Search by course number, course name, or instructor..." 
-                 value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
-          <button type="submit">Search</button>
-          <button type="button" class="clear-btn" onclick="clearForm()">Clear</button>
+        <div class="search-title">
+            <h2>Find a Class</h2>
+            <a href="advanced-search.php" class="adv-search-btn">Advanced Search</a>
         </div>
-      </form>
+        <form method="GET" action="">
+            <div class="search-row">
+                <input type="text" id="search" name="search"
+                       placeholder="Search by course number, course name, or instructor..."
+                       value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
+                <button type="submit">Search</button>
+                <button type="button" class="clear-btn" onclick="clearForm()">Clear</button>
+            </div>
+        </form>
     </div>
 
     <?php
