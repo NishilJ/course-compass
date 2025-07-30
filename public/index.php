@@ -13,24 +13,22 @@
     </div>
     <div class="right-section">
         <span class="title">Course Compass</span>
+        <a href="advanced-search.php" class="advanced-btn">Advanced Search</a>
     </div>
 </div>
 
   <div class="container">
-      <div class="search-section">
-          <div class="search-title">
-              <h2>Find a Class</h2>
-              <a href="advanced-search.php" class="adv-search-btn">Advanced Search</a>
-          </div>
-          <form method="GET" action="">
-              <div class="search-row">
-                  <input type="text" id="search" name="search"
-                         placeholder="Search by course number, course name, or instructor..."
-                         value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
-                  <button type="submit">Search</button>
-                  <button type="button" class="clear-btn" onclick="clearForm()">Clear</button>
-            </div>
-        </form>
+    <div class="search-section">
+      <h2>Find a Class</h2>
+      <form method="GET" action="">
+        <div class="search-row">
+          <input type="text" id="search" name="search" 
+                 placeholder="Search by course number, course name, or instructor..." 
+                 value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
+          <button type="submit">Search</button>
+          <button type="button" class="clear-btn" onclick="clearForm()">Clear</button>
+        </div>
+      </form>
     </div>
 
     <?php
@@ -42,23 +40,20 @@
         
         // Build the SQL query to search across all fields
         $sql = "SELECT DISTINCT
-            s.section_id,
-            CONCAT(c.course_prefix, ' ', c.course_number) AS course_code,
-            c.course_description AS course_description,
-            i.instructor_name AS instructor_name,
-            s.term,
-            s.days,
-            s.start_time,
-            s.end_time
-        FROM section s
-        LEFT JOIN course c ON s.course_id = c.course_id
-        LEFT JOIN instructor i ON s.instructor_id = i.instructor_id
-        WHERE c.course_prefix LIKE ? 
-           OR c.course_number LIKE ? 
-           OR c.course_description LIKE ? 
-           OR i.instructor_name LIKE ?
-        ORDER BY c.course_prefix, c.course_number, s.term, s.start_time";
-
+                    CONCAT(c.course_prefix, ' ', c.course_number) as course_code,
+                    c.course_description as title,
+                    i.instructor_name as instructor,
+                    c.course_prefix,
+                    c.course_number
+                FROM course c
+                LEFT JOIN section s ON c.course_id = s.course_id
+                LEFT JOIN instructor i ON s.instructor_id = i.instructor_id
+                WHERE c.course_prefix LIKE ? 
+                   OR c.course_number LIKE ? 
+                   OR c.course_description LIKE ? 
+                   OR i.instructor_name LIKE ?
+                ORDER BY c.course_prefix, c.course_number";
+        
         // Prepare and execute the statement
         $stmt = $conn->prepare($sql);
         if ($stmt) {
@@ -74,26 +69,18 @@
                 echo '<th>Course Code</th>';
                 echo '<th>Title</th>';
                 echo '<th>Instructor</th>';
-                echo '<th>Term</th>';
-                echo '<th>Days</th>';
-                echo '<th>Start Time</th>';
-                echo '<th>End Time</th>';
                 echo '</tr>';
                 echo '</thead>';
                 echo '<tbody>';
-
+                
                 while ($row = $result->fetch_assoc()) {
                     echo '<tr>';
                     echo '<td>' . htmlspecialchars($row['course_code']) . '</td>';
                     echo '<td>' . htmlspecialchars($row['title']) . '</td>';
                     echo '<td>' . htmlspecialchars($row['instructor'] ?? 'TBD') . '</td>';
-                    echo '<td>' . htmlspecialchars($row['term'] ?? 'TBD') . '</td>';
-                    echo '<td>' . htmlspecialchars($row['days'] ?? '-') . '</td>';
-                    echo '<td>' . htmlspecialchars($row['start_time'] ?? '-') . '</td>';
-                    echo '<td>' . htmlspecialchars($row['end_time'] ?? '-') . '</td>';
                     echo '</tr>';
                 }
-
+                
                 echo '</tbody>';
                 echo '</table>';
             } else {
