@@ -31,6 +31,7 @@
       </div>
     </div>
 </div>
+
 <div class="container">
     <div class="search-section">
         <div class="search-title">
@@ -49,36 +50,41 @@
     </div>
 
     <?php
-    // Only show results if there's a search
     if (!empty($_GET['search'])) {
         echo '<h2>Search Results</h2>';
         
         $search_term = $_GET['search'];
-        
-        // Build the SQL query to search across all fields
+
         $sql = "SELECT DISTINCT
-                    CONCAT(c.course_prefix, ' ', c.course_number) as course_code,
-                    c.course_description as title,
-                    i.instructor_name as instructor,
-                    c.course_prefix,
-                    c.course_number
-                FROM course c
-                LEFT JOIN section s ON c.course_id = s.course_id
-                LEFT JOIN instructor i ON s.instructor_id = i.instructor_id
-                WHERE c.course_prefix LIKE ? 
-                   OR c.course_number LIKE ? 
-                   OR c.course_description LIKE ? 
-                   OR i.instructor_name LIKE ?
-                ORDER BY c.course_prefix, c.course_number";
+                s.section_id,
+                c.course_prefix,
+                c.course_number,
+                CONCAT(c.course_prefix, ' ', c.course_number) AS course_code,
+                c.course_description AS course_description,
+                i.instructor_name AS instructor_name,
+                s.term,
+                s.days,
+                s.start_time,
+                s.end_time,
+                s.location
+            FROM section s
+            LEFT JOIN course c ON s.course_id = c.course_id
+            LEFT JOIN instructor i ON s.instructor_id = i.instructor_id
+            WHERE CONCAT(c.course_prefix, ' ', c.course_number) LIKE ?
+               OR c.course_prefix LIKE ? 
+               OR c.course_number LIKE ? 
+               OR c.course_description LIKE ? 
+               OR i.instructor_name LIKE ?
+            ORDER BY c.course_prefix, c.course_number, s.term, s.start_time";
         
-        // Prepare and execute the statement
         $stmt = $conn->prepare($sql);
         if ($stmt) {
             $search_pattern = '%' . $search_term . '%';
-            $stmt->bind_param('ssss', $search_pattern, $search_pattern, $search_pattern, $search_pattern);
+            $stmt->bind_param('sssss', $search_pattern, $search_pattern, $search_pattern, $search_pattern, $search_pattern);
             $stmt->execute();
             $result = $stmt->get_result();
-            
+
+
             if ($result->num_rows > 0) {
                 echo '<table>';
                 echo '<thead>';
@@ -86,18 +92,30 @@
                 echo '<th>Course Code</th>';
                 echo '<th>Title</th>';
                 echo '<th>Instructor</th>';
+                echo '<th>Term</th>';
+                echo '<th>Days</th>';
+                echo '<th>Time</th>';
+                echo '<th>Location</th>';
                 echo '</tr>';
                 echo '</thead>';
                 echo '<tbody>';
-                
+
                 while ($row = $result->fetch_assoc()) {
+                    $start = date("g:i A", strtotime($row["start_time"]));
+                    $end = date("g:i A", strtotime($row["end_time"]));
+                    $time = "$start – $end";
+
                     echo '<tr>';
                     echo '<td>' . htmlspecialchars($row['course_code']) . '</td>';
-                    echo '<td>' . htmlspecialchars($row['title']) . '</td>';
-                    echo '<td>' . htmlspecialchars($row['instructor'] ?? 'TBD') . '</td>';
+                    echo '<td>' . htmlspecialchars($row['course_description']) . '</td>';
+                    echo '<td>' . htmlspecialchars($row['instructor_name'] ?? 'TBD') . '</td>';
+                    echo '<td>' . htmlspecialchars($row['term'] ?? 'TBD') . '</td>';
+                    echo '<td>' . htmlspecialchars($row['days'] ?? '-') . '</td>';
+                    echo '<td>' . $time . '</td>';
+                    echo '<td>' . htmlspecialchars($row['location']) . '</td>';
                     echo '</tr>';
                 }
-                
+
                 echo '</tbody>';
                 echo '</table>';
             } else {
@@ -105,7 +123,7 @@
             }
             $stmt->close();
         } else {
-            echo '<div class="no-results">Error preparing search query.</div>';
+            echo '<div class="no-results"> Error preparing search query: ' . htmlspecialchars($conn->error) . '</div>';
         }
     }
     ?>
@@ -118,4 +136,4 @@
     }
   </script>
 </body>
-</html> 
+</html>
