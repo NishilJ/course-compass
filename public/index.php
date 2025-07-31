@@ -57,6 +57,7 @@
         
         // Build the SQL query to search across all fields
         $sql = "SELECT DISTINCT
+                    c.course_id,
                     CONCAT(c.course_prefix, ' ', c.course_number) as course_code,
                     c.course_description as title,
                     i.instructor_name as instructor,
@@ -91,10 +92,17 @@
                 echo '<tbody>';
                 
                 while ($row = $result->fetch_assoc()) {
-                    echo '<tr>';
+                    echo '<tr class="clickable-row" onclick="toggleCourseDetails(' . $row['course_id'] . ')">';
                     echo '<td>' . htmlspecialchars($row['course_code']) . '</td>';
                     echo '<td>' . htmlspecialchars($row['title']) . '</td>';
                     echo '<td>' . htmlspecialchars($row['instructor'] ?? 'TBD') . '</td>';
+                    echo '</tr>';
+                    echo '<tr class="course-details-row" id="details-' . $row['course_id'] . '" style="display: none;">';
+                    echo '<td colspan="3">';
+                    echo '<div class="course-details-content" id="content-' . $row['course_id'] . '">';
+                    echo '<div class="loading">Loading course details...</div>';
+                    echo '</div>';
+                    echo '</td>';
                     echo '</tr>';
                 }
                 
@@ -111,10 +119,37 @@
     ?>
   </div>
 
+  </div>
+
   <script>
     function clearForm() {
       document.getElementById('search').value = '';
       window.location.href = window.location.pathname;
+    }
+
+    function toggleCourseDetails(courseId) {
+      const detailsRow = document.getElementById('details-' + courseId);
+      const contentDiv = document.getElementById('content-' + courseId);
+      
+      if (detailsRow.style.display === 'none') {
+        // Show the details row
+        detailsRow.style.display = 'table-row';
+        
+        // Load course details if not already loaded
+        if (contentDiv.innerHTML.includes('Loading course details...')) {
+          fetch('get_course_details.php?course_id=' + courseId)
+            .then(response => response.text())
+            .then(data => {
+              contentDiv.innerHTML = data;
+            })
+            .catch(error => {
+              contentDiv.innerHTML = '<div class="error-message">Error loading course details.</div>';
+            });
+        }
+      } else {
+        // Hide the details row
+        detailsRow.style.display = 'none';
+      }
     }
   </script>
 </body>
