@@ -652,3 +652,136 @@ tr:hover {
         padding: 15px;
     }
 }
+/* Reset / base */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f7;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+/* Main container */
+.course-details {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 30px 20px;
+    background-color: #f4f4f7;
+}
+
+/* Header section */
+.course-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.course-header h1 {
+    font-size: 2.8rem;
+    color: #a84300; /* UTD burnt orange */
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.course-title {
+    font-size: 1.25rem;
+    color: #555;
+}
+
+/* Grid layout */
+.course-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+/* Info cards */
+.info-card {
+    background-color: #fff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    border-left: 4px solid #a84300;
+}
+
+/* Card headings */
+.info-card h3 {
+    color: #a84300;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+/* Label/value styling */
+.info-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 0.96rem;
+    align-items: flex-start;
+}
+
+.info-item strong {
+    width: 130px; /* ⬅️ adjust as needed for longest label */
+    flex-shrink: 0;
+    color: #222;
+    font-weight: 600;
+    text-align: right;
+}
+
+/* Prerequisites */
+.prereq-list {
+    list-style: disc;
+    padding-left: 20px;
+    margin-top: 10px;
+}
+
+/* Courses taught list */
+ul {
+    margin-top: 8px;
+    padding-left: 20px;
+}
+
+ul li {
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+}
+
+/* Error messages */
+.error-message {
+    max-width: 600px;
+    margin: 60px auto;
+    padding: 20px;
+    background-color: #ffe0e0;
+    color: #b00020;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Responsive layout */
+@media (max-width: 768px) {
+    .course-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .course-header h1 {
+        font-size: 2rem;
+    }
+
+    .info-card {
+        padding: 18px;
+    }
+
+    .info-item strong {
+        width: 100px;
+    }
+    .info-item span {
+    flex: 1;
+}
+}

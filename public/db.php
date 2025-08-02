@@ -1,5 +1,5 @@
 <?php
-$host = 'localhost';
+$host = 'db';
 $user = 'root';
 $password = 'root';
 $database = 'course_compass'; 
