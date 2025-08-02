@@ -644,20 +644,6 @@ tr:hover {
         padding: 15px;
     }
 }
-/* Reset / base */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f4f7;
-    color: #333;
-    line-height: 1.6;
-    padding: 20px;
-}
 
 /* Main container */
 .course-details {
