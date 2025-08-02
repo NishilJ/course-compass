@@ -149,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="top-bar">
         <div class="left-section">
             <span class="title">
-                <a href="index.php">Course Compass</a>
+                <a href="/">Course Compass</a>
             </span>
         </div>
         <div class="logo">
@@ -161,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <i class="dropbtn material-icons">menu</i>
                 </div>
                 <div class="dropdown-content">
-                    <a href="index.php">Home</a>
+                    <a href="/">Home</a>
                     <a href="admin-login.php">Admin Login</a>
                 </div>
             </div>
@@ -271,7 +271,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </script>
 
         <div class="back-link">
-            <a href="index.php">← Back to Course Search</a>
+            <a href="/">← Back to Course Search</a>
         </div>
     </div>
 </body>
