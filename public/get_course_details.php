@@ -9,9 +9,9 @@ if (isset($_GET['course_id'])) {
                 c.course_id,
                 c.course_prefix,
                 c.course_number,
-                c.course_description,
+                c.course_subject AS course_title,
                 c.course_credits,
-                c.course_subject,
+                c.course_description,
                 s.section_id,
                 s.term,
                 s.days,
@@ -46,7 +46,7 @@ if (isset($_GET['course_id'])) {
                     <div class="info-card">
                         <h3>Course Information</h3>
                         <div class="info-item">
-                            <strong>Subject:</strong> <?php echo htmlspecialchars($course['course_subject']); ?>
+                            <strong>Description:</strong> <?php echo htmlspecialchars($course['course_description']); ?>
                         </div>
                         <div class="info-item">
                             <strong>Credit Hours:</strong> <?php echo htmlspecialchars($course['course_credits']); ?>
