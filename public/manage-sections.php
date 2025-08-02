@@ -97,7 +97,7 @@ if (isset($_GET['logout'])) {
     <div class="top-bar">
         <div class="left-section">
             <span class="title">
-                <a href="index.php">Course Compass</a>
+                <a href="/">Course Compass</a>
             </span>
         </div>
         <div class="logo">
@@ -109,7 +109,7 @@ if (isset($_GET['logout'])) {
                     <i class="dropbtn material-icons">menu</i>
                 </div>
                 <div class="dropdown-content">
-                    <a href="index.php">Home</a>
+                    <a href="/">Home</a>
                     <a href="admin-dashboard.php">Dashboard</a>
                     <a href="?logout=1">Log Out</a>
                 </div>

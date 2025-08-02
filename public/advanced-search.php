@@ -12,7 +12,7 @@
         <div class="top-bar">
             <div class="left-section">
                 <span class="title">
-                    <a href="index.php">Course Compass</a>
+                    <a href="/">Course Compass</a>
                 </span>
             </div>
             <div class="logo">
@@ -24,7 +24,7 @@
                         <i class="dropbtn material-icons">menu</i>
                     </div>
                     <div class="dropdown-content">
-                        <a href="index.php">Home</a>
+                        <a href="/">Home</a>
                         <a href="admin-login.php">Admin</a>
                     </div>
                 </div>
@@ -42,7 +42,7 @@
             <div class="search-section">
                 <div class="search-title">
                     <h2>Find a Class</h2>
-                    <a href="index.php" class="adv-search-btn">Quick Search</a>
+                    <a href="/" class="adv-search-btn">Quick Search</a>
                 </div>
                 <form method="GET" action="advanced-search.php" id="search-form">
                     <div class="search-grid">

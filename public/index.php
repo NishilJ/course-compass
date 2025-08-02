@@ -12,7 +12,7 @@
 <div class="top-bar">
     <div class="left-section">
       <span class="title">
-        <a href="/public/index.php">Course Compass</a>
+        <a href="/">Course Compass</a>
       </span>
     </div>
     <div class="logo">
@@ -25,7 +25,7 @@
           <i class="dropbtn material-icons">menu</i>
         </div>
         <div class="dropdown-content">
-          <a href="index.php">Home</a>
+          <a href="/">Home</a>
           <a href="admin-login.php">Admin</a>
         </div>
       </div>
