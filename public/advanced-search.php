@@ -3,19 +3,20 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Course Compass</title>
-        <link rel="stylesheet" href="styles.css">
+        <link rel="stylesheet" href="assets/css/styles.css">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     </head>
     <body>
         <div class="top-bar">
             <div class="left-section">
                 <span class="title">
-                    <a href="/course-compass/public">Course Compass</a>
+                    <a href="index.php">Course Compass</a>
                 </span>
             </div>
             <div class="logo">
-                <img src="utd-logo.svg" alt="Logo" class="logo-img">
+                <img src="assets/images/utd-logo.svg" alt="Logo" class="logo-img">
             </div>
             <div class="right-section">
                 <div class="dropdown">
@@ -23,9 +24,8 @@
                         <i class="dropbtn material-icons">menu</i>
                     </div>
                     <div class="dropdown-content">
-                        <a href="/course-compass/public">Home</a>
-                        <a href="#">Admin</a>
-                        <a href="#">Log Out</a>
+                        <a href="index.php">Home</a>
+                        <a href="admin-login.php">Admin</a>
                     </div>
                 </div>
             </div>
@@ -42,58 +42,68 @@
             <div class="search-section">
                 <div class="search-title">
                     <h2>Find a Class</h2>
-                    <a href="/course-compass/public" class="adv-search-btn">Quick Search</a>
+                    <a href="index.php" class="adv-search-btn">Quick Search</a>
                 </div>
-                <div class="search-row">
-                    <form method="GET" action="advanced-search.php" id="search-form">
-                        <label for="course_prefix">Course Prefix:</label>
-                        <select name="course_prefix" id="course_prefix">
-                            <option value="">Any</option>
-                            <?php foreach ($prefixes as $prefix): ?>
-                                <option value="<?= htmlspecialchars($prefix['course_prefix']) ?>"
-                                    <?= ($_GET['course_prefix'] ?? '') === $prefix['course_prefix'] ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($prefix['course_prefix']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                <form method="GET" action="advanced-search.php" id="search-form">
+                    <div class="search-grid">
+                        <div class="search-field">
+                            <label for="course_prefix">Course Prefix</label>
+                            <select name="course_prefix" id="course_prefix">
+                                <option value="">Any</option>
+                                <?php foreach ($prefixes as $prefix): ?>
+                                    <option value="<?= htmlspecialchars($prefix['course_prefix']) ?>"
+                                        <?= ($_GET['course_prefix'] ?? '') === $prefix['course_prefix'] ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($prefix['course_prefix']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                        <label for="course_number">Course Number:</label>
-                        <select name="course_number" id="course_number">
-                            <option value="">Any</option>
-                            <?php foreach ($numbers as $number): ?>
-                                <option value="<?= htmlspecialchars($number['course_number']) ?>"
-                                    <?= ($_GET['course_number'] ?? '') === $number['course_number'] ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($number['course_number']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                        <div class="search-field">
+                            <label for="course_number">Course Number</label>
+                            <select name="course_number" id="course_number">
+                                <option value="">Any</option>
+                                <?php foreach ($numbers as $number): ?>
+                                    <option value="<?= htmlspecialchars($number['course_number']) ?>"
+                                        <?= ($_GET['course_number'] ?? '') === $number['course_number'] ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($number['course_number']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                        <label for="instructor_name">Instructor:</label>
-                        <select name="instructor_name" id="instructor_name">
-                            <option value="">Any</option>
-                            <?php foreach ($instructors as $instructor): ?>
-                                <option value="<?= htmlspecialchars($instructor['instructor_name']) ?>"
-                                    <?= ($_GET['instructor_name'] ?? '') === $instructor['instructor_name'] ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($instructor['instructor_name']) ?>
-                                </option>
-                            <?php endforeach; ?>
+                        <div class="search-field">
+                            <label for="instructor_name">Instructor</label>
+                            <select name="instructor_name" id="instructor_name">
+                                <option value="">Any</option>
+                                <?php foreach ($instructors as $instructor): ?>
+                                    <option value="<?= htmlspecialchars($instructor['instructor_name']) ?>"
+                                        <?= ($_GET['instructor_name'] ?? '') === $instructor['instructor_name'] ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($instructor['instructor_name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                        </select>
-
-                        <label for="term">Term:</label>
-                        <select name="term" id="term">
-                            <option value="">Any</option>
-                            <?php foreach ($terms as $term): ?>
-                                <option value="<?= htmlspecialchars($term['term']) ?>"
-                                    <?= ($_GET['term'] ?? '') === $term['term'] ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($term['term']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                        <div class="search-field">
+                            <label for="term">Term</label>
+                            <select name="term" id="term">
+                                <option value="">Any</option>
+                                <?php foreach ($terms as $term): ?>
+                                    <option value="<?= htmlspecialchars($term['term']) ?>"
+                                        <?= ($_GET['term'] ?? '') === $term['term'] ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($term['term']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="search-buttons">
                         <button type="submit">Search</button>
                         <button type="button" class="clear-btn" onclick="clearForm()">Clear</button>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
 
             <?php

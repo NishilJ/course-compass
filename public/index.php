@@ -1,52 +1,54 @@
 <?php include('db.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Course Compass</title>
-        <link rel="stylesheet" href="styles.css">
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    </head>
-    <body>
-        <div class="top-bar">
-            <div class="left-section">
-                <span class="title">
-                    <a href="/course-compass/public">Course Compass</a>
-                </span>
-            </div>
-            <div class="logo">
-                <img src="utd-logo.svg" alt="Logo" class="logo-img">
-            </div>
-            <div class="right-section">
-                <div class="dropdown">
-                    <div class="icon">
-                        <i class="dropbtn material-icons">menu</i>
-                    </div>
-                    <div class="dropdown-content">
-                        <a href="/course-compass/public">Home</a>
-                        <a href="#">Admin</a>
-                        <a href="#">Log Out</a>
-                    </div>
-                </div>
-            </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Compass - Search Courses</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+<div class="top-bar">
+    <div class="left-section">
+      <span class="title">
+        <a href="/public/index.php">Course Compass</a>
+      </span>
+    </div>
+    <div class="logo">
+      <img src="assets/images/utd-logo.svg" alt="Logo" class="logo-img">
+    </div>
+    <div class="right-section">
+      <!-- <i class="menu material-icons">menu</i> -->
+      <div class="dropdown">
+        <div class="icon">
+          <i class="dropbtn material-icons">menu</i>
         </div>
+        <div class="dropdown-content">
+          <a href="index.php">Home</a>
+          <a href="admin-login.php">Admin</a>
+        </div>
+      </div>
+    </div>
+</div>
 
-        <div class="container">
-            <div class="search-section">
-                <div class="search-title">
-                    <h2>Find a Class</h2>
-                    <a href="advanced-search.php" class="adv-search-btn">Advanced Search</a>
-                </div>
-                <form method="GET" action="">
-                    <div class="search-row">
-                        <input type="text" id="search" name="search"
-                               placeholder="Search by course number, course name, or instructor..."
-                               value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
-                        <button type="submit">Search</button>
-                        <button type="button" class="clear-btn" onclick="clearForm()">Clear</button>
-                    </div>
-                </form>
+<div class="container">
+    <div class="search-section">
+        <div class="search-title">
+            <h2>Find a Class</h2>
+            <a href="advanced-search.php" class="adv-search-btn">Advanced Search</a>
+        </div>
+        <form method="GET" action="">
+            <div class="search-row">
+                <input type="text" id="search" name="search" maxlength="100"
+                       placeholder="Search by course number, course name, or instructor..."
+                       value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>"
+                       title="Search for courses, instructors, or course descriptions">
+                <button type="submit">Search</button>
+                <button type="button" class="clear-btn" onclick="clearForm()">Clear</button>
             </div>
+        </form>
+    </div>
 
             <?php
             if (!empty($_GET['search'])) {
