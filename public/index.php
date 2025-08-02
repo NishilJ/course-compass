@@ -59,7 +59,7 @@
                         c.course_prefix,
                         c.course_number,
                         CONCAT(c.course_prefix, ' ', c.course_number) AS course_code,
-                        c.course_description AS course_description,
+                        c.course_title AS course_title,
                         i.instructor_name AS instructor_name,
                         s.term,
                         s.days,
@@ -72,7 +72,7 @@
                     WHERE CONCAT(c.course_prefix, ' ', c.course_number) LIKE ?
                        OR c.course_prefix LIKE ? 
                        OR c.course_number LIKE ? 
-                       OR c.course_description LIKE ? 
+                       OR c.course_title LIKE ? 
                        OR i.instructor_name LIKE ?
                     ORDER BY c.course_prefix, c.course_number, s.term, s.start_time";
 
@@ -107,7 +107,7 @@
                             $courseId = htmlspecialchars($row['section_id']); // Use section_id for details
                             echo "<tr class='clickable-row' data-course-id='{$courseId}' onclick='toggleCourseDetails({$courseId})'>";
                             echo '<td>' . htmlspecialchars($row['course_code']) . '</td>';
-                            echo '<td>' . htmlspecialchars($row['course_description']) . '</td>';
+                            echo '<td>' . htmlspecialchars($row['course_title']) . '</td>';
                             echo '<td>' . htmlspecialchars($row['instructor_name'] ?? 'TBD') . '</td>';
                             echo '<td>' . htmlspecialchars($row['term'] ?? 'TBD') . '</td>';
                             echo '<td>' . htmlspecialchars($row['days'] ?? '-') . '</td>';

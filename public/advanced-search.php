@@ -133,7 +133,7 @@
                         c.course_prefix,
                         c.course_number,
                         CONCAT(c.course_prefix, ' ', c.course_number) AS course_code,
-                        c.course_description,
+                        c.course_title,
                         i.instructor_name,
                         s.term,
                         s.days,
@@ -172,7 +172,7 @@
 
                             echo '<tr>';
                             echo '<td>' . htmlspecialchars($row['course_code']) . '</td>';
-                            echo '<td>' . htmlspecialchars($row['course_description']) . '</td>';
+                            echo '<td>' . htmlspecialchars($row['course_title']) . '</td>';
                             echo '<td>' . htmlspecialchars($row['instructor_name'] ?? 'TBD') . '</td>';
                             echo '<td>' . htmlspecialchars($row['term'] ?? 'TBD') . '</td>';
                             echo '<td>' . htmlspecialchars($row['days'] ?? '-') . '</td>';
