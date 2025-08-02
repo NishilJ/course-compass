@@ -143,7 +143,7 @@
                         c.course_prefix,
                         c.course_number,
                         CONCAT(c.course_prefix, ' ', c.course_number) AS course_code,
-                        c.course_title,
+                        c.course_subject AS course_title,
                         i.instructor_name,
                         s.term,
                         s.days,

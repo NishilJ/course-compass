@@ -9,9 +9,9 @@ if (isset($_GET['course_id'])) {
                 c.course_id,
                 c.course_prefix,
                 c.course_number,
-                c.course_title,
+                c.course_subject AS course_title,
                 c.course_credits,
-                c.course_subject,
+                c.course_description,
                 s.section_id,
                 s.term,
                 s.days,
@@ -46,7 +46,7 @@ if (isset($_GET['course_id'])) {
                     <div class="info-card">
                         <h3>Course Information</h3>
                         <div class="info-item">
-                            <strong>Subject:</strong> <?php echo htmlspecialchars($course['course_subject']); ?>
+                            <strong>Description:</strong> <?php echo htmlspecialchars($course['course_description']); ?>
                         </div>
                         <div class="info-item">
                             <strong>Credit Hours:</strong> <?php echo htmlspecialchars($course['course_credits']); ?>
@@ -81,7 +81,7 @@ if (isset($_GET['course_id'])) {
                             <?php
                             // Show courses taught by this instructor (now inside the Instructor Information card)
                             if (!empty($course['instructor_id'])) {
-                                $courses_sql = "SELECT DISTINCT c.course_prefix, c.course_number, c.course_title
+                                $courses_sql = "SELECT DISTINCT c.course_prefix, c.course_number, c.course_subject AS course_title
                                                 FROM section s
                                                 JOIN course c ON s.course_id = c.course_id
                                                 WHERE s.instructor_id = ?";
@@ -112,7 +112,7 @@ if (isset($_GET['course_id'])) {
                 $prereq_sql = "SELECT 
                                 p.course_prerequisite,
                                 CONCAT(c2.course_prefix, ' ', c2.course_number) as prereq_code,
-                                c2.course_title as prereq_title
+                                c2.course_subject as prereq_title
                               FROM prerequisites p
                               JOIN course c2 ON p.course_prerequisite = c2.course_id
                               WHERE p.course_id = ?";

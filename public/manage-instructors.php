@@ -22,13 +22,13 @@ function importInstructorsFromCSV($conn, $csvFile) {
             if (count($data) >= 6) {
                 $instructor_id = intval($data[0]);
                 $instructor_name = trim($data[1]);
-                $instructor_phone = trim($data[2]);
+                $instructor_phone = intval($data[2]);
                 $instructor_email = trim($data[3]);
                 $instructor_office = trim($data[4]);
                 $instructor_dep = trim($data[5]);
                 
                 $stmt = $conn->prepare("INSERT IGNORE INTO instructor (instructor_id, instructor_name, instructor_phone, instructor_email, instructor_office, instructor_dep) VALUES (?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param('isssss', $instructor_id, $instructor_name, $instructor_phone, $instructor_email, $instructor_office, $instructor_dep);
+                $stmt->bind_param('isisss', $instructor_id, $instructor_name, $instructor_phone, $instructor_email, $instructor_office, $instructor_dep);
                 
                 if ($stmt->execute() && $conn->affected_rows > 0) {
                     $success++;
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $name = trim($_POST['instructor_name']);
                 $email = trim($_POST['instructor_email']);
                 $department = trim($_POST['instructor_dep']);
-                $phone = trim($_POST['instructor_phone']);
+                $phone = intval($_POST['instructor_phone']);
                 $office = trim($_POST['instructor_office']);
                 
                 $errors = [];
@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 if (empty($errors)) {
                     $stmt = $conn->prepare("INSERT INTO instructor (instructor_name, instructor_email, instructor_dep, instructor_phone, instructor_office) VALUES (?, ?, ?, ?, ?)");
-                    $stmt->bind_param('sssss', $name, $email, $department, $phone, $office);
+                    $stmt->bind_param('sssis', $name, $email, $department, $phone, $office);
                     
                     if ($stmt->execute()) {
                         $message = 'Instructor added successfully!';

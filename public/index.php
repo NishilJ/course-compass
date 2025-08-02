@@ -61,7 +61,8 @@
                         c.course_prefix,
                         c.course_number,
                         CONCAT(c.course_prefix, ' ', c.course_number) AS course_code,
-                        c.course_title AS course_title,
+                        c.course_subject AS course_title,
+                        c.course_description AS course_description,
                         i.instructor_name AS instructor_name,
                         s.term,
                         s.days,
@@ -74,14 +75,15 @@
                     WHERE CONCAT(c.course_prefix, ' ', c.course_number) LIKE ?
                        OR c.course_prefix LIKE ? 
                        OR c.course_number LIKE ? 
-                       OR c.course_title LIKE ? 
+                       OR c.course_subject LIKE ? 
+                       OR c.course_description LIKE ? 
                        OR i.instructor_name LIKE ?
                     ORDER BY c.course_prefix, c.course_number, s.term, s.start_time";
 
                 $stmt = $conn->prepare($sql);
                 if ($stmt) {
                     $search_pattern = '%' . $search_term . '%';
-                    $stmt->bind_param('sssss', $search_pattern, $search_pattern, $search_pattern, $search_pattern, $search_pattern);
+                    $stmt->bind_param('ssssss', $search_pattern, $search_pattern, $search_pattern, $search_pattern, $search_pattern, $search_pattern);
                     $stmt->execute();
                     $result = $stmt->get_result();
 

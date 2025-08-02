@@ -33,7 +33,7 @@ function importSectionsFromCSV($conn, $csvFile) {
                 $end_date = trim($data[10]);
                 
                 $stmt = $conn->prepare("INSERT IGNORE INTO section (section_id, instructor_id, course_id, location, capacity, term, start_time, end_time, days, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param('iiisiisssss', $section_id, $instructor_id, $course_id, $location, $capacity, $term, $start_time, $end_time, $days, $start_date, $end_date);
+                $stmt->bind_param('iiissssssss', $section_id, $instructor_id, $course_id, $location, $capacity, $term, $start_time, $end_time, $days, $start_date, $end_date);
                 
                 if ($stmt->execute() && $conn->affected_rows > 0) {
                     $success++;
