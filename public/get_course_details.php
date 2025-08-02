@@ -1,4 +1,3 @@
-
 <?php include('db.php'); ?>
 
 <?php
@@ -10,7 +9,7 @@ if (isset($_GET['course_id'])) {
                 c.course_id,
                 c.course_prefix,
                 c.course_number,
-                c.course_description,
+                c.course_title,
                 c.course_credits,
                 c.course_subject,
                 s.section_id,
@@ -40,7 +39,7 @@ if (isset($_GET['course_id'])) {
             <div class="course-details">
                 <div class="course-header">
                     <h1><?php echo htmlspecialchars($course['course_prefix'] . ' ' . $course['course_number']); ?></h1>
-                    <p class="course-title"><?php echo htmlspecialchars($course['course_description']); ?></p>
+                    <p class="course-title"><?php echo htmlspecialchars($course['course_title']); ?></p>
                 </div>
                 
                 <div class="course-info-grid">
@@ -82,7 +81,7 @@ if (isset($_GET['course_id'])) {
                             <?php
                             // Show courses taught by this instructor (now inside the Instructor Information card)
                             if (!empty($course['instructor_id'])) {
-                                $courses_sql = "SELECT DISTINCT c.course_prefix, c.course_number, c.course_description
+                                $courses_sql = "SELECT DISTINCT c.course_prefix, c.course_number, c.course_title
                                                 FROM section s
                                                 JOIN course c ON s.course_id = c.course_id
                                                 WHERE s.instructor_id = ?";
@@ -94,7 +93,7 @@ if (isset($_GET['course_id'])) {
                                     echo '<div class="info-item"><strong>Courses Taught:</strong></div>';
                                     echo '<ul>';
                                     while ($taught = $courses_result->fetch_assoc()) {
-                                        echo '<li>' . htmlspecialchars($taught['course_prefix'] . ' ' . $taught['course_number']) . ' - ' . htmlspecialchars($taught['course_description']) . '</li>';
+                                        echo '<li>' . htmlspecialchars($taught['course_prefix'] . ' ' . $taught['course_number']) . ' - ' . htmlspecialchars($taught['course_title']) . '</li>';
                                     }
                                     echo '</ul>';
                                 }
@@ -113,7 +112,7 @@ if (isset($_GET['course_id'])) {
                 $prereq_sql = "SELECT 
                                 p.course_prerequisite,
                                 CONCAT(c2.course_prefix, ' ', c2.course_number) as prereq_code,
-                                c2.course_description as prereq_title
+                                c2.course_title as prereq_title
                               FROM prerequisites p
                               JOIN course c2 ON p.course_prerequisite = c2.course_id
                               WHERE p.course_id = ?";
