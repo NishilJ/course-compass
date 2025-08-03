@@ -32,28 +32,7 @@ $stats = [
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-    <div class="top-bar">
-        <div class="left-section">
-            <span class="title">
-                <a href="/">Course Compass</a>
-            </span>
-        </div>
-        <div class="logo">
-            <img src="assets/images/utd-logo.svg" alt="Logo" class="logo-img">
-        </div>
-        <div class="right-section">
-            <div class="dropdown">
-                <div class="icon">
-                    <i class="dropbtn material-icons">menu</i>
-                </div>
-                <div class="dropdown-content">
-                    <a href="/">Home</a>
-                    <a href="admin-dashboard.php">Dashboard</a>
-                    <a href="?logout=1">Log Out</a>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php include 'navbar.php'; ?>
 
     <div class="admin-container">
         <div class="page-header">

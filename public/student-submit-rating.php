@@ -118,42 +118,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-    body { background: #f2f5f9; font-family: system-ui,-apple-system,BlinkMacSystemFont,sans-serif; margin:0; }
-    .top-bar {
-        background: #a35200;
-        padding: 10px 20px;
-        display: flex;
-        align-items: center;
-        color: white;
-        gap: 20px;
-    }
-    .top-bar .title a { color: white; text-decoration: none; font-weight: bold; font-size: 1.2rem; }
-    .logo img { height: 30px; }
-    .right-section { margin-left: auto; }
-    .dropdown { position: relative; display: inline-block; }
-    .dropbtn { cursor: pointer; color: white; font-size: 24px; }
-    .dropdown-content {
-        display: none;
-        position: absolute;
-        right: 0;
-        background: white;
-        min-width: 160px;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-        z-index: 10;
-        border-radius: 5px;
-        overflow: hidden;
-    }
-    .dropdown-content a {
-        display: block;
-        padding: 10px 14px;
-        color: #333;
-        text-decoration: none;
-        font-size: 0.9rem;
-    }
-    .dropdown-content a:hover { background: #f1f1f1; }
-    .dropdown:hover .dropdown-content { display: block; }
-
-    .container { max-width: 960px; margin: 30px auto; padding: 0 12px; }
     .page-header {
         display: flex;
         justify-content: space-between;
@@ -214,24 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </style>
 </head>
 <body>
-    <div class="top-bar">
-        <div class="left-section">
-            <span class="title"><a href="/">COURSE COMPASS</a></span>
-        </div>
-        <div class="logo">
-            <img src="assets/images/utd-logo.svg" alt="Logo">
-        </div>
-        <div class="right-section">
-            <div class="dropdown">
-                <i class="material-icons dropbtn">menu</i>
-                <div class="dropdown-content">
-                    <a href="/">Home</a>
-                    <a href="manage-ratings.php">Ratings</a>
-                    <a href="?logout=1">Log Out</a>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php include 'navbar.php'; ?>
 
     <div class="container">
         <div class="page-header">
