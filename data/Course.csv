@@ -1,30 +1,31 @@
-101,CS,3,Computer Science,1337,Introduction to Programming
-102,CS,3,Computer Science,3345,Data Structures & Algorithms
-103,SE,3,Software Engineering,3306,Software Project Management
-104,CS,3,Computer Science,4375,Operating Systems
-105,CS,3,Computer Science,4485,Computer Networks
-106,SE,3,Software Engineering,4351,Requirements Engineering
-107,CS,3,Computer Science,3380,Database Systems
-108,SE,3,Software Engineering,4381,Software Testing
-109,CS,3,Computer Science,4301,Programming Languages
-110,SE,3,Software Engineering,4365,Agile Software Development
-111,CS,3,Computer Science,4390,Artificial Intelligence
-112,SE,3,Software Engineering,4305,Object-Oriented Design
-113,CS,3,Computer Science,4310,Computer Architecture
-114,CS,3,Computer Science,4330,Mobile App Development
-115,SE,3,Software Engineering,4320,Software Design Patterns
-116,CS,3,Computer Science,4328,Operating Systems Lab
-117,SE,3,Software Engineering,4345,Human-Centered Design
-118,CS,3,Computer Science,4315,Machine Learning
-119,SE,3,Software Engineering,4361,DevOps
-120,CS,3,Computer Science,4380,Computer Graphics
-121,SE,3,Software Engineering,4391,Cloud Computing
-122,CS,3,Computer Science,4309,Parallel Computing
-123,SE,3,Software Engineering,4355,Engineering Ethics
-124,CS,3,Computer Science,4378,Cybersecurity Principles
-125,SE,3,Software Engineering,4382,Advanced Testing
-126,CS,3,Computer Science,4386,Big Data Analytics
-127,SE,3,Software Engineering,4373,Secure Software Engineering
-128,CS,3,Computer Science,4306,Compiler Design
-129,SE,3,Software Engineering,4393,Continuous Integration
-130,CS,3,Computer Science,4326,Digital Forensics
+course_id,course_prefix,course_credits,course_subject,course_number,course_title,course_description
+101,CS,3,Computer Science,1337,Introduction to Programming,"An introduction to programming using structured languages; covers basic control structures, data types, and problem-solving techniques."
+102,CS,3,Computer Science,3345,Data Structures & Algorithms,"Analysis of algorithms including time complexity and Big‑O notation; implementation of stacks, queues, trees (including B‑trees), heaps, hashing, and graph algorithms. Emphasizes design and implementation." 
+103,SE,3,Software Engineering,3306,Software Project Management,"Focuses on processes and tools for successful software project planning, scheduling, risk analysis, and quality assurance."
+104,CS,3,Computer Science,4375,Operating Systems,"Study of modern operating system concepts including process management, scheduling, synchronization, memory management, file systems, and device drivers."
+105,CS,3,Computer Science,4485,Computer Networks,"Teaches principles of data communications and networking: protocols, layering, switching, routing, and TCP/IP architecture."
+106,SE,3,Software Engineering,4351,Requirements Engineering,"Covers elicitation, specification, and validation of software requirements; modeling techniques and managing stakeholder interactions."
+107,CS,3,Computer Science,3380,Database Systems,"Introduction to relational database design, SQL querying, normalization, transactions, indexing, and basic database connectivity."
+108,SE,3,Software Engineering,4381,Software Testing,"Principles and practices of software testing; test planning, test case design, fault analysis, and automated testing tools."
+109,CS,3,Computer Science,4301,Programming Languages,"Explores design concepts of modern programming languages; syntax, semantics, paradigms, type systems, and language translation."
+110,SE,3,Software Engineering,4365,Agile Software Development,"Covers agile methodologies such as Scrum and Kanban; emphasis on iterative development, user stories, and continuous integration."
+111,CS,3,Computer Science,4390,Artificial Intelligence,"Survey of foundational AI topics: search, knowledge representation, machine learning basics, reasoning, and planning techniques."
+112,SE,3,Software Engineering,4305,Object-Oriented Design,"Design of object-oriented software using UML; covers design patterns, abstractions, and modular system architecture."
+113,CS,3,Computer Science,4310,Computer Architecture,"Examines computer organization: instruction sets, pipelining, memory hierarchy, and performance metrics."
+114,CS,3,Computer Science,4330,Mobile App Development,"Design and development of mobile applications for Android and iOS; covers UI frameworks, APIs, and deployment."
+115,SE,3,Software Engineering,4320,Software Design Patterns,"Study of object-oriented design patterns such as Singleton, Factory, Observer and how to apply them in real-world software."
+116,CS,1,Computer Science,4328,Operating Systems Lab,"Laboratory course accompanying OS theory; covers system calls, kernel modules, process control, and concurrency exercises."
+117,SE,3,Software Engineering,4345,Human-Centered Design,"Human-centered design methodology; user research, prototyping, usability testing, and iterative interface design."
+118,CS,3,Computer Science,4315,Machine Learning,"Introduction to supervised and unsupervised learning, models including regression, decision trees, clustering, and evaluation metrics."
+119,SE,3,Software Engineering,4361,DevOps,"Principles and practices of DevOps: continuous integration, continuous deployment, infrastructure as code, and monitoring."
+120,CS,3,Computer Science,4380,Computer Graphics,"Fundamentals of rendering, modeling, transformation, shading, and animation; includes real-time graphics techniques."
+121,SE,3,Software Engineering,4391,Cloud Computing,"Concepts and architecture of cloud platforms, virtualization, distributed systems, microservices, and orchestration."
+122,CS,3,Computer Science,4309,Parallel Computing,"Principles of parallel algorithms, multi-core processing, synchronization, performance metrics, and programming models."
+123,SE,3,Software Engineering,4355,Engineering Ethics,"Study of ethical issues in computing professions including privacy, intellectual property, and social impact."
+124,CS,3,Computer Science,4378,Cybersecurity Principles,"Cybersecurity foundations; covers threat modeling, encryption, authentication, network security, and incident response."
+125,SE,3,Software Engineering,4382,Advanced Testing,"Advanced software testing strategies: automated testing frameworks, fuzz testing, performance and security testing."
+126,CS,3,Computer Science,4386,Big Data Analytics,"Analyzing large-scale data systems; covers data processing pipelines, analytics frameworks, and visualization."
+127,SE,3,Software Engineering,4373,Secure Software Engineering,"Secure design principles, threat mitigation, code reviews, and security validation in software lifecycle."
+128,CS,3,Computer Science,4306,Compiler Design,"Techniques for designing compilers: lexical analysis, parsing, semantic analysis, optimization, and code generation."
+129,SE,3,Software Engineering,4393,Continuous Integration,"Implementation of CI pipelines, automated building, testing infrastructure, and version control practices."
+130,CS,3,Computer Science,4326,Digital Forensics,"Principles of digital investigation: crime scene data collection, analysis tools, network forensics, and evidence preservation."

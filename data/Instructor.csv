@@ -1,3 +1,4 @@
+instructor_id,instructor_name,instructor_phone,instructor_email,instructor_office,instructor_dep
 1,Dr. Jane Smith,9728831234,jane.smith@utdallas.edu,ECSW 3.210,Computer Science
 2,Dr. Alan Lee,9728835678,alan.lee@utdallas.edu,ECSS 2.312,Software Engineering
 3,Dr. Emily Johnson,9728834321,emily.johnson@utdallas.edu,ECSS 3.420,Computer Science

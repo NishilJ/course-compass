@@ -1,7 +1,8 @@
+rating_id,instructor_id,rating_number,rating_student_grade
 1,1,4,A
 2,1,5,A
 3,2,3,B
-4,2,4,N/A
+4,2,4,""
 5,3,4,B
 6,3,5,A
 7,4,2,C
