@@ -251,7 +251,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </script>
 
         <div class="back-link">
-            <a href="/">← Back to Course Search</a>
+            <a href="index.php">← Back to Course Search</a>
         </div>
     </div>
 </body>

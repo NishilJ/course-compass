@@ -23,7 +23,7 @@
             <div class="search-section">
                 <div class="search-title">
                     <h2>Find a Class</h2>
-                    <a href="/" class="adv-search-btn">Quick Search</a>
+                    <a href="index.php" class="adv-search-btn">Quick Search</a>
                 </div>
                 <form method="GET" action="advanced-search.php" id="search-form">
                     <div class="search-grid">
