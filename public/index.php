@@ -9,28 +9,8 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-<div class="top-bar">
-    <div class="left-section">
-      <span class="title">
-        <a href="/">Course Compass</a>
-      </span>
-    </div>
-    <div class="logo">
-      <img src="assets/images/utd-logo.svg" alt="Logo" class="logo-img">
-    </div>
-    <div class="right-section">
-      <!-- <i class="menu material-icons">menu</i> -->
-      <div class="dropdown">
-        <div class="icon">
-          <i class="dropbtn material-icons">menu</i>
-        </div>
-        <div class="dropdown-content">
-          <a href="/">Home</a>
-          <a href="admin-login.php">Admin</a>
-        </div>
-      </div>
-    </div>
-</div>
+<?php include 'navbar.php'; ?>
+
 
 <div class="container">
     <div class="search-section">

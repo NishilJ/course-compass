@@ -1,30 +1,21 @@
-<!-- navbar.php -->
-<style>
-    .navbar {
-        background-color: #f2f2f2;
-        padding: 10px;
-        border-bottom: 1px solid #ccc;
-        margin-bottom: 20px;
-        font-family: sans-serif;
-    }
-
-    .navbar a {
-        text-decoration: none;
-        color: #333;
-        padding: 8px 16px;
-        margin-right: 10px;
-        border-radius: 5px;
-        transition: background-color 0.3s ease;
-    }
-
-    .navbar a:hover {
-        background-color: #ddd;
-    }
-</style>
-
-<div class="navbar">
-    <a href="http://localhost:8080/select-injection.php">Select Injection </a>
-    <a href="http://localhost:8080/update-injection.php">Update Injection</a>
-    <a href="http://localhost:8080/update-injection2.php">Update Injection 2</a>
-    <a href="http://localhost:8080/prepared-statement.php">Prepared Statement</a>
+<div class="nav-bar">
+    <div class="left-section">
+      <span class="title">
+        <a href="index.php">Course Compass</a>
+      </span>
+    </div>
+    <div class="logo">
+      <img src="assets/images/utd-logo.svg" alt="Logo" class="logo-img">
+    </div>
+    <div class="right-section">
+      <div class="dropdown">
+        <div class="icon">
+          <i class="dropbtn material-icons">menu</i>
+        </div>
+        <div class="dropdown-content">
+          <a href="index.php">Home</a>
+          <a href="admin-login.php">Admin</a>
+        </div>
+      </div>
+    </div>
 </div>

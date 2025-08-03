@@ -29,7 +29,7 @@ html {
     scrollbar-width: none;
 }
 
-.top-bar {
+.nav-bar {
     background-color: var(--primary-color);
     color: white;
     padding: 0 0 0 30px;
@@ -532,7 +532,7 @@ tr:hover {
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
-    .top-bar {
+    .nav-bar {
         padding: 0 0 0 20px;
         min-height: 60px;
     }
