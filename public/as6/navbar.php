@@ -23,8 +23,8 @@
 </style>
 
 <div class="navbar">
-    <a href="http://localhost:8080/select-injection.php">Select Injection </a>
-    <a href="http://localhost:8080/update-injection.php">Update Injection</a>
-    <a href="http://localhost:8080/update-injection2.php">Update Injection 2</a>
-    <a href="http://localhost:8080/prepared-statement.php">Prepared Statement</a>
+    <a href="http://localhost:8080/as6/select-injection.php">Select Injection </a>
+    <a href="http://localhost:8080/as6/update-injection.php">Update Injection</a>
+    <a href="http://localhost:8080/as6/update-injection2.php">Update Injection 2</a>
+    <a href="http://localhost:8080/as6/prepared-statement.php">Prepared Statement</a>
 </div>

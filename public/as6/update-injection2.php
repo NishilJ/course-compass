@@ -1,18 +1,18 @@
 <?php
-include('db.php'); 
+include('../db.php'); 
 include('navbar.php');
 $message = "";
-$executed_sql = "";  // variable to store the executed query
+$executed_sql = "";   
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['username'], $_POST['old_password'], $_POST['new_password'])) {
     $username = $_POST['username'];
     $old_password = $_POST['old_password'];
     $new_password = $_POST['new_password'];
 
-    // Build the vulnerable SQL query (for demo)
+     
     $sql = "UPDATE users SET password = '$new_password' WHERE username = '$username' AND password = '$old_password'";
 
-    // Store the executed query safely for display
+    
     $executed_sql = htmlspecialchars($sql);
 
     if ($conn->query($sql) === TRUE) {
