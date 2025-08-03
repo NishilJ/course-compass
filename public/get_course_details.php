@@ -11,7 +11,7 @@ if (isset($_GET['course_id'])) {
                 c.course_number,
                 c.course_subject AS course_title,
                 c.course_credits,
-                c.course_description,
+                c.course_title,
                 s.section_id,
                 s.term,
                 s.days,
@@ -39,14 +39,14 @@ if (isset($_GET['course_id'])) {
             <div class="course-details">
                 <div class="course-header">
                     <h1><?php echo htmlspecialchars($course['course_prefix'] . ' ' . $course['course_number']); ?></h1>
-                    <p class="course-title"><?php echo htmlspecialchars($course['course_description']); ?></p>
+                    <p class="course-title"><?php echo htmlspecialchars($course['course_title']); ?></p>
                 </div>
                 
                 <div class="course-info-grid">
                     <div class="info-card">
                         <h3>Course Information</h3>
                         <div class="info-item">
-                            <strong>Description:</strong> <?php echo htmlspecialchars($course['course_description']); ?>
+                            <strong>Title:</strong> <?php echo htmlspecialchars($course['course_title']); ?>
                         </div>
                         <div class="info-item">
                             <strong>Credit Hours:</strong> <?php echo htmlspecialchars($course['course_credits']); ?>
@@ -81,7 +81,7 @@ if (isset($_GET['course_id'])) {
                             <?php
                             // Show courses taught by this instructor (now inside the Instructor Information card)
                             if (!empty($course['instructor_id'])) {
-                                $courses_sql = "SELECT DISTINCT c.course_prefix, c.course_number, c.course_description
+                                $courses_sql = "SELECT DISTINCT c.course_prefix, c.course_number, c.course_title
                                                 FROM section s
                                                 JOIN course c ON s.course_id = c.course_id
                                                 WHERE s.instructor_id = ?";
@@ -91,11 +91,9 @@ if (isset($_GET['course_id'])) {
                                 $courses_result = $courses_stmt->get_result();
                                 if ($courses_result->num_rows > 0) {
                                     echo '<div class="info-item"><strong>Courses Taught:</strong></div>';
-                                    echo '<ul>';
                                     while ($taught = $courses_result->fetch_assoc()) {
-                                        echo '<li>' . htmlspecialchars($taught['course_prefix'] . ' ' . $taught['course_number']) . ' - ' . htmlspecialchars($taught['course_description']) . '</li>';
+                                        echo htmlspecialchars($taught['course_prefix'] . ' ' . $taught['course_number']) . ' - ' . htmlspecialchars($taught['course_title']) . '<br>';
                                     }
-                                    echo '</ul>';
                                 }
                                 $courses_stmt->close();
                             }
@@ -112,7 +110,7 @@ if (isset($_GET['course_id'])) {
                 $prereq_sql = "SELECT 
                                 p.course_prerequisite,
                                 CONCAT(c2.course_prefix, ' ', c2.course_number) as prereq_code,
-                                c2.course_description as prereq_title
+                                c2.course_title as prereq_title
                               FROM prerequisites p
                               JOIN course c2 ON p.course_prerequisite = c2.course_id
                               WHERE p.course_id = ?";
@@ -128,8 +126,8 @@ if (isset($_GET['course_id'])) {
                         echo '<h3>Prerequisites</h3>';
                         echo '<ul class="prereq-list">';
                         while ($prereq = $prereq_result->fetch_assoc()) {
-                            echo '<li>' . htmlspecialchars($prereq['prereq_code']) . ' - ' . 
-                                 htmlspecialchars($prereq['prereq_title']) . '</li>';
+                            echo htmlspecialchars($prereq['prereq_code']) . ' - ' .
+                                 htmlspecialchars($prereq['prereq_title']);
                         }
                         echo '</ul>';
                         echo '</div>';
