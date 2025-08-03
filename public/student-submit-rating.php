@@ -236,10 +236,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container">
         <div class="page-header">
             <h1><i class="material-icons" style="vertical-align: middle; margin-right: 8px;">rate_review</i>Submit Instructor Rating</h1>
-            <a href="manage-ratings.php" class="back-btn">
-                <i class="material-icons" style="vertical-align: middle; margin-right:5px;">arrow_back</i>
-                Back to Ratings
-            </a>
+<a href="javascript:history.back()" class="back-btn">
+    <i class="material-icons" style="vertical-align: middle; margin-right:5px;">arrow_back</i>
+    Go Back
+</a>
         </div>
 
         <div class="form-card">
@@ -390,7 +390,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         updateChartForInstructor(sel);
         console.log('InstructorRatingsMap:', instructorRatingsMap, 'Initial selection:', sel);
     });
-  
 </script>
 </body>
 </html>
