@@ -34,39 +34,87 @@
             if (!empty($_GET['search'])) {
                 echo '<h2>Search Results</h2>';
 
-                $search_term = $_GET['search'];
+                $search_term = strtoupper(trim($_GET['search']));
+                $search_pattern = '%' . $search_term . '%';
 
-                $sql = "SELECT DISTINCT
-                        s.section_id,
-                        c.course_prefix,
-                        c.course_number,
-                        CONCAT(c.course_prefix, ' ', c.course_number) AS course_code,
-                        c.course_subject AS course_title,
-                        c.course_title AS course_title,
-                        i.instructor_name AS instructor_name,
-                        s.term,
-                        s.days,
-                        s.start_time,
-                        s.end_time,
-                        s.location
-                    FROM section s
-                    LEFT JOIN course c ON s.course_id = c.course_id
-                    LEFT JOIN instructor i ON s.instructor_id = i.instructor_id
-                    WHERE CONCAT(c.course_prefix, ' ', c.course_number) LIKE ?
-                       OR c.course_prefix LIKE ? 
-                       OR c.course_number LIKE ? 
-                       OR c.course_subject LIKE ? 
-                       OR c.course_title LIKE ? 
-                       OR i.instructor_name LIKE ?
-                    ORDER BY c.course_prefix, c.course_number, s.term, s.start_time";
+                // Normalize input and determine search type
+                if (preg_match('/^[A-Z]{2,4}$/', $search_term)) {
+                    // Exact course prefix match
+                    $sql = "SELECT DISTINCT
+                                s.section_id,
+                                c.course_prefix,
+                                c.course_number,
+                                CONCAT(c.course_prefix, ' ', c.course_number) AS course_code,
+                                c.course_title AS course_title,
+                                i.instructor_name AS instructor_name,
+                                s.term,
+                                s.days,
+                                s.start_time,
+                                s.end_time,
+                                s.location
+                            FROM section s
+                            LEFT JOIN course c ON s.course_id = c.course_id
+                            LEFT JOIN instructor i ON s.instructor_id = i.instructor_id
+                            WHERE c.course_prefix = ?
+                            ORDER BY c.course_prefix, c.course_number, s.term, s.start_time";
 
-                $stmt = $conn->prepare($sql);
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param('s', $search_term);
+
+                } elseif (preg_match('/^[A-Z]{2,4} \d{3,4}$/', $search_term)) {
+                    // Exact full course code match (e.g., SE 3306)
+                    $sql = "SELECT DISTINCT
+                                s.section_id,
+                                c.course_prefix,
+                                c.course_number,
+                                CONCAT(c.course_prefix, ' ', c.course_number) AS course_code,
+                                c.course_title AS course_title,
+                                i.instructor_name AS instructor_name,
+                                s.term,
+                                s.days,
+                                s.start_time,
+                                s.end_time,
+                                s.location
+                            FROM section s
+                            LEFT JOIN course c ON s.course_id = c.course_id
+                            LEFT JOIN instructor i ON s.instructor_id = i.instructor_id
+                            WHERE CONCAT(c.course_prefix, ' ', c.course_number) = ?
+                            ORDER BY c.course_prefix, c.course_number, s.term, s.start_time";
+
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param('s', $search_term);
+
+                } else {
+                    // General fuzzy search
+                    $sql = "SELECT DISTINCT
+                                s.section_id,
+                                c.course_prefix,
+                                c.course_number,
+                                CONCAT(c.course_prefix, ' ', c.course_number) AS course_code,
+                                c.course_title AS course_title,
+                                i.instructor_name AS instructor_name,
+                                s.term,
+                                s.days,
+                                s.start_time,
+                                s.end_time,
+                                s.location
+                            FROM section s
+                            LEFT JOIN course c ON s.course_id = c.course_id
+                            LEFT JOIN instructor i ON s.instructor_id = i.instructor_id
+                            WHERE CONCAT(c.course_prefix, ' ', c.course_number) LIKE ?
+                            OR c.course_number LIKE ?
+                            OR c.course_subject LIKE ?
+                            OR c.course_title LIKE ?
+                            OR i.instructor_name LIKE ?
+                            ORDER BY c.course_prefix, c.course_number, s.term, s.start_time";
+
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param('sssss', $search_pattern, $search_pattern, $search_pattern, $search_pattern, $search_pattern);
+                }
+
                 if ($stmt) {
-                    $search_pattern = '%' . $search_term . '%';
-                    $stmt->bind_param('ssssss', $search_pattern, $search_pattern, $search_pattern, $search_pattern, $search_pattern, $search_pattern);
                     $stmt->execute();
                     $result = $stmt->get_result();
-
 
                     if ($result->num_rows > 0) {
                         echo '<table>';
@@ -88,7 +136,7 @@
                             $end = date("g:i A", strtotime($row["end_time"]));
                             $time = "$start – $end";
 
-                            $courseId = htmlspecialchars($row['section_id']); // Use section_id for details
+                            $courseId = htmlspecialchars($row['section_id']);
                             echo "<tr class='clickable-row' data-course-id='{$courseId}' onclick='toggleCourseDetails({$courseId})'>";
                             echo '<td>' . htmlspecialchars($row['course_code']) . '</td>';
                             echo '<td>' . htmlspecialchars($row['course_title']) . '</td>';
@@ -112,6 +160,7 @@
                 }
             }
             ?>
+ 
         </div>
 
         <script>
