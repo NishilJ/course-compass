@@ -18,30 +18,58 @@ function importSectionsFromCSV($conn, $csvFile) {
     $errors = 0;
     
     if (($handle = fopen($csvFile, "r")) !== FALSE) {
+        $rowNum = 0;
         while (($data = fgetcsv($handle, 1000, ",", '"', "\\")) !== FALSE) {
-            if (count($data) >= 11) {
-                $section_id = intval($data[0]);
-                $instructor_id = intval($data[1]);
-                $course_id = intval($data[2]);
-                $location = trim($data[3]);
-                $capacity = intval($data[4]);
-                $term = trim($data[5]);
-                $start_time = trim($data[6]);
-                $end_time = trim($data[7]);
-                $days = trim($data[8]);
-                $start_date = trim($data[9]);
-                $end_date = trim($data[10]);
-                
-                $stmt = $conn->prepare("INSERT IGNORE INTO section (section_id, instructor_id, course_id, location, capacity, term, start_time, end_time, days, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param('iiissssssss', $section_id, $instructor_id, $course_id, $location, $capacity, $term, $start_time, $end_time, $days, $start_date, $end_date);
-                
-                if ($stmt->execute() && $conn->affected_rows > 0) {
+            $rowNum++;
+
+            // Skip empty or malformed rows
+            if (count($data) < 11) {
+                echo "<p style='color: orange;'>Row $rowNum skipped: not enough columns.</p>";
+                $errors++;
+                continue;
+            }
+
+            $section_id = intval($data[0]);
+            $instructor_id = intval($data[1]);
+            $course_id = intval($data[2]);
+            $location = trim($data[3]);
+            $capacity = intval($data[4]);
+            $term = trim($data[5]);
+            $start_time = trim($data[6]);
+            $end_time = trim($data[7]);
+            $days = trim($data[8]);
+            $start_date = trim($data[9]);
+            $end_date = trim($data[10]);
+
+            $stmt = $conn->prepare("INSERT INTO section 
+                (section_id, course_id,instructor_id, location, capacity, term, start_time, end_time, days, start_date, end_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+            if (!$stmt) {
+                echo "<p style='color: red;'>Prepare failed: " . htmlspecialchars($conn->error) . "</p>";
+                $errors++;
+                continue;
+            }
+
+            $stmt->bind_param(
+                'iiissssssss',
+                $section_id, $instructor_id, $course_id, $location, $capacity, $term,
+                $start_time, $end_time, $days, $start_date, $end_date
+            );
+
+            if ($stmt->execute()) {
+                if ($stmt->affected_rows > 0) {
                     $success++;
                 } else {
+                    echo "<p style='color: orange;'>Row $rowNum skipped: no rows affected (likely duplicate section_id).</p>";
                     $errors++;
                 }
-                $stmt->close();
+            } else {
+                echo "<p style='color: red;'>Row $rowNum insert failed: " . htmlspecialchars($stmt->error) . "</p>";
+                $errors++;
             }
+
+            $stmt->close();
         }
         fclose($handle);
     }

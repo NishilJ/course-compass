@@ -27,7 +27,7 @@ function importCoursesFromCSV($conn, $csvFile) {
                 $course_number = intval($data[4]);
                 $course_description = trim($data[5]);
                 
-                $stmt = $conn->prepare("INSERT IGNORE INTO course (course_id, course_prefix, course_credits, course_subject, course_number, course_description) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt = $conn->prepare("INSERT IGNORE INTO course (course_id, course_prefix, course_credits, course_subject, course_number, course_title) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->bind_param('isisis', $course_id, $course_prefix, $course_credits, $course_subject, $course_number, $course_description);
                 
                 if ($stmt->execute() && $conn->affected_rows > 0) {
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'add':
                 $prefix = strtoupper(trim($_POST['course_prefix']));
                 $number = intval($_POST['course_number']);
-                $description = trim($_POST['course_description']);
+                $description = trim($_POST['course_title']);
                 $subject = trim($_POST['course_subject']);
                 $credits = intval($_POST['course_credits']);
                 
@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 
                 if (empty($errors)) {
-                    $stmt = $conn->prepare("INSERT INTO course (course_prefix, course_number, course_description, course_subject, course_credits) VALUES (?, ?, ?, ?, ?)");
+                    $stmt = $conn->prepare("INSERT INTO course (course_prefix, course_number, course_title, course_subject, course_credits) VALUES (?, ?, ?, ?, ?)");
                     $stmt->bind_param('sissi', $prefix, $number, $description, $subject, $credits);
                     
                     if ($stmt->execute()) {
@@ -252,7 +252,7 @@ $courses_result = $conn->query($courses_query);
                             <?php while ($course = $courses_result->fetch_assoc()): ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($course['course_prefix'] . ' ' . $course['course_number']); ?></td>
-                                    <td><?php echo htmlspecialchars($course['course_description']); ?></td>
+                                    <td><?php echo htmlspecialchars($course['course_title']); ?></td>
                                     <td><?php echo htmlspecialchars($course['course_subject'] ?? '-'); ?></td>
                                     <td><?php echo $course['course_credits']; ?></td>
                                     <td>
