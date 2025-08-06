@@ -25,10 +25,11 @@ function importCoursesFromCSV($conn, $csvFile) {
                 $course_credits = intval($data[2]);
                 $course_subject = trim($data[3]);
                 $course_number = intval($data[4]);
-                $course_description = trim($data[5]);
+                $course_title = trim($data[5]);
+                $course_description = trim($data[6]);
                 
-                $stmt = $conn->prepare("INSERT IGNORE INTO course (course_id, course_prefix, course_credits, course_subject, course_number, course_title) VALUES (?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param('isisis', $course_id, $course_prefix, $course_credits, $course_subject, $course_number, $course_description);
+                $stmt = $conn->prepare("INSERT IGNORE INTO course (course_id, course_prefix, course_credits, course_subject, course_number, course_title, course_description) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param('isissss', $course_id, $course_prefix, $course_credits, $course_subject, $course_number, $course_title, $course_description);
                 
                 if ($stmt->execute() && $conn->affected_rows > 0) {
                     $success++;
@@ -51,7 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'add':
                 $prefix = strtoupper(trim($_POST['course_prefix']));
                 $number = intval($_POST['course_number']);
-                $description = trim($_POST['course_title']);
+                $title = trim($_POST['course_title']);
+                $description = trim($_POST['course_description']);
                 $subject = trim($_POST['course_subject']);
                 $credits = intval($_POST['course_credits']);
                 
@@ -65,6 +67,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $errors[] = 'Course number must be exactly 4 digits (1000-9999).';
                 }
                 
+                if (empty($title)) {
+                    $errors[] = 'Course title is required.';
+                }
+                
                 if (empty($description)) {
                     $errors[] = 'Course description is required.';
                 }
@@ -74,8 +80,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 
                 if (empty($errors)) {
-                    $stmt = $conn->prepare("INSERT INTO course (course_prefix, course_number, course_title, course_subject, course_credits) VALUES (?, ?, ?, ?, ?)");
-                    $stmt->bind_param('sissi', $prefix, $number, $description, $subject, $credits);
+                    $stmt = $conn->prepare("INSERT INTO course (course_prefix, course_number, course_title, course_description, course_subject, course_credits) VALUES (?, ?, ?, ?, ?, ?)");
+                    $stmt->bind_param('sisssi', $prefix, $number, $title, $description, $subject, $credits);
                     
                     if ($stmt->execute()) {
                         $message = 'Course added successfully!';
@@ -197,6 +203,10 @@ $courses_result = $conn->query($courses_query);
                         <input type="number" id="course_credits" name="course_credits" min="1" max="6" value="3" placeholder="3" title="Credits must be between 1 and 6">
                     </div>
                     <div class="form-group">
+                        <label for="course_title">Course Title *</label>
+                        <input type="text" id="course_title" name="course_title" required placeholder="e.g., Introduction to Java" maxlength="100">
+                    </div>
+                    <div class="form-group">
                         <label for="course_subject">Course Subject</label>
                         <input type="text" id="course_subject" name="course_subject" placeholder="e.g., Computer Science" maxlength="100">
                     </div>
@@ -217,7 +227,7 @@ $courses_result = $conn->query($courses_query);
                 <i class="material-icons" style="vertical-align: middle; margin-right: 10px;">file_upload</i>
                 Import from CSV
             </h3>
-            <p style="color: #666; margin-bottom: 15px;">Upload a CSV file with course data (format: course_id, course_prefix, course_credits, course_subject, course_number, course_description)</p>
+            <p style="color: #666; margin-bottom: 15px;">Upload a CSV file with course data (format: course_id, course_prefix, course_credits, course_subject, course_number, course_description, course_title)</p>
             <form method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="import_csv">
                 <div class="form-group">
@@ -241,6 +251,7 @@ $courses_result = $conn->query($courses_query);
                     <thead>
                         <tr>
                             <th>Course Code</th>
+                            <th>Course Title</th>
                             <th>Description</th>
                             <th>Subject</th>
                             <th>Credits</th>
@@ -253,6 +264,7 @@ $courses_result = $conn->query($courses_query);
                                 <tr>
                                     <td><?php echo htmlspecialchars($course['course_prefix'] . ' ' . $course['course_number']); ?></td>
                                     <td><?php echo htmlspecialchars($course['course_title']); ?></td>
+                                    <td><?php echo htmlspecialchars($course['course_description']); ?></td>
                                     <td><?php echo htmlspecialchars($course['course_subject'] ?? '-'); ?></td>
                                     <td><?php echo $course['course_credits']; ?></td>
                                     <td>
