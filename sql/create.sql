@@ -1,16 +1,16 @@
 CREATE TABLE course (
-    course_id INT NOT NULL,
+    course_id INT NOT NULL AUTO_INCREMENT,
     course_prefix VARCHAR(10) NOT NULL,
     course_credits INT NOT NULL,
     course_subject VARCHAR(255) NOT NULL,
     course_number INT NOT NULL,
     course_title VARCHAR (255) NOT NULL,
-    course_description VARCHAR(255) DEFAULT NULL,
+    course_description TEXT DEFAULT NULL,
     PRIMARY KEY (course_id)
 );
 
 CREATE TABLE instructor (
-    instructor_id INT NOT NULL,
+    instructor_id INT NOT NULL AUTO_INCREMENT,
     instructor_name VARCHAR(255) NOT NULL,
     instructor_phone BIGINT DEFAULT NULL,
     instructor_email VARCHAR(255) DEFAULT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE instructor (
 );
 
 CREATE TABLE section (
-    section_id INT NOT NULL,
+    section_id INT NOT NULL AUTO_INCREMENT,
     course_id INT NOT NULL,
     instructor_id INT NOT NULL,
     location VARCHAR(255) DEFAULT 'UTD',
@@ -32,23 +32,33 @@ CREATE TABLE section (
     start_date DATE DEFAULT NULL,
     end_date DATE DEFAULT NULL,
     PRIMARY KEY (section_id),
-    FOREIGN KEY (instructor_id) REFERENCES instructor (instructor_id) ON DELETE RESTRICT,
-    FOREIGN KEY (course_id) REFERENCES course (course_id) ON DELETE RESTRICT
+    FOREIGN KEY (instructor_id) REFERENCES instructor (instructor_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    FOREIGN KEY (course_id) REFERENCES course (course_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
 );
 
 CREATE TABLE prerequisite (
     course_id INT NOT NULL,
     course_prerequisite INT NOT NULL,
     PRIMARY KEY (course_id, course_prerequisite),
-    FOREIGN KEY (course_id) REFERENCES course (course_id) ON DELETE CASCADE,
-    FOREIGN KEY (course_prerequisite) REFERENCES course (course_id) ON DELETE CASCADE
+    FOREIGN KEY (course_id) REFERENCES course (course_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (course_prerequisite) REFERENCES course (course_id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 CREATE TABLE rating (
-    rating_id INT NOT NULL,
+    rating_id INT NOT NULL AUTO_INCREMENT,
     instructor_id INT NOT NULL,
     rating_number TINYINT NOT NULL,
-    rating_student_grade VARCHAR(2) DEFAULT NULL,
+    rating_student_grade ENUM('A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F') DEFAULT NULL,
     PRIMARY KEY (rating_id),
-    FOREIGN KEY (instructor_id) REFERENCES instructor (instructor_id) ON DELETE RESTRICT
+    FOREIGN KEY (instructor_id) REFERENCES instructor (instructor_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
 );
