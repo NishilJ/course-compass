@@ -137,7 +137,7 @@
                             $time = "$start – $end";
 
                             $courseId = htmlspecialchars($row['section_id']);
-                            echo "<tr class='clickable-row' data-course-id='{$courseId}' onclick='toggleCourseDetails({$courseId})'>";
+                            echo "<tr class='clickable-row' data-course-id='$courseId' onclick='toggleCourseDetails($courseId)'>";
                             echo '<td>' . htmlspecialchars($row['course_code']) . '</td>';
                             echo '<td>' . htmlspecialchars($row['course_title']) . '</td>';
                             echo '<td>' . htmlspecialchars($row['instructor_name'] ?? 'TBD') . '</td>';
@@ -146,7 +146,7 @@
                             echo '<td>' . $time . '</td>';
                             echo '<td>' . htmlspecialchars($row['location']) . '</td>';
                             echo '</tr>';
-                            echo "<tr id='details-{$courseId}' class='course-details-row' style='display:none;'><td colspan='7'>Loading...</td></tr>";
+                            echo "<tr id='details-$courseId' class='course-details-row' style='display:none;'><td colspan='7'>Loading...</td></tr>";
                         }
 
                         echo '</tbody>';

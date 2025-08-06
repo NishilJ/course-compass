@@ -153,7 +153,17 @@
 
                     if ($result->num_rows > 0) {
                         echo '<table>';
-                        echo '<thead><tr><th>Course Code</th><th>Title</th><th>Instructor</th><th>Term</th><th>Days</th><th>Time</th><th>Location</th></tr></thead>';
+                        echo '<thead>';
+                        echo '<tr>';
+                        echo '<th>Course Code</th>';
+                        echo '<th>Title</th>';
+                        echo '<th>Instructor</th>';
+                        echo '<th>Term</th>';
+                        echo '<th>Days</th>';
+                        echo '<th>Time</th>';
+                        echo '<th>Location</th>';
+                        echo '</tr>';
+                        echo '</thead>';
                         echo '<tbody>';
 
                         while ($row = $result->fetch_assoc()) {
@@ -161,7 +171,8 @@
                             $end = date("g:i A", strtotime($row["end_time"]));
                             $time = "$start – $end";
 
-                            echo '<tr>';
+                            $courseId = htmlspecialchars($row['section_id']);
+                            echo "<tr class='clickable-row' data-course-id='$courseId' onclick='toggleCourseDetails($courseId)'>";
                             echo '<td>' . htmlspecialchars($row['course_code']) . '</td>';
                             echo '<td>' . htmlspecialchars($row['course_title']) . '</td>';
                             echo '<td>' . htmlspecialchars($row['instructor_name'] ?? 'TBD') . '</td>';
@@ -170,16 +181,17 @@
                             echo '<td>' . $time . '</td>';
                             echo '<td>' . htmlspecialchars($row['location']) . '</td>';
                             echo '</tr>';
+                            echo "<tr id='details-$courseId' class='course-details-row' style='display:none;'><td colspan='7'>Loading...</td></tr>";
                         }
 
-                        echo '</tbody></table>';
+                        echo '</tbody>';
+                        echo '</table>';
                     } else {
-                        echo '<div class="no-results">No results found.</div>';
+                        echo '<div class="no-results">No courses found matching your search criteria.</div>';
                     }
-
                     $stmt->close();
                 } else {
-                    echo '<div class="no-results">Query error: ' . htmlspecialchars($conn->error) . '</div>';
+                    echo '<div class="no-results"> Error preparing search query: ' . htmlspecialchars($conn->error) . '</div>';
                 }
             }
             ?>
@@ -193,6 +205,25 @@
                 selects.forEach(select => {
                     select.selectedIndex = 0;
                 });
+            }
+            function toggleCourseDetails(courseId) {
+                const detailsRow = document.getElementById('details-' + courseId);
+                if (detailsRow.style.display === 'none') {
+                    detailsRow.style.display = '';
+                    if (!detailsRow.dataset.loaded) {
+                        fetch('get_course_details.php?course_id=' + courseId)
+                            .then(response => response.text())
+                            .then(data => {
+                                detailsRow.children[0].innerHTML = data;
+                                detailsRow.dataset.loaded = "true";
+                            })
+                            .catch(() => {
+                                detailsRow.children[0].innerHTML = "Error loading details.";
+                            });
+                    }
+                } else {
+                    detailsRow.style.display = 'none';
+                }
             }
         </script>
     </body>
