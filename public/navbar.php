@@ -15,7 +15,9 @@
             <div class="dropdown-content">
                 <a href="index.php">Home</a>
                 <a href="admin-dashboard.php">Admin</a>
-                <a href="?logout=1">Log Out</a>
+                <?php if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true): ?>
+                    <a href="?logout=1">Log Out</a>
+                <?php endif ?>
             </div>
         </div>
     </div>
