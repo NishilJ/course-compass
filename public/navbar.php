@@ -14,7 +14,7 @@
             </div>
             <div class="dropdown-content">
                 <a href="index.php">Home</a>
-                <a href="admin-login.php">Admin</a>
+                <a href="admin-dashboard.php">Admin</a>
                 <a href="?logout=1">Log Out</a>
             </div>
         </div>
