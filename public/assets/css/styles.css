@@ -647,16 +647,13 @@ tr:hover {
 
 /* Main container */
 .course-details {
-    max-width: 1100px;
-    margin: 40px auto;
-    padding: 30px 20px;
-    background-color: #f4f4f7;
+    margin: 20px;
 }
 
 /* Header section */
 .course-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
 }
 
 .course-header h1 {
@@ -675,8 +672,7 @@ tr:hover {
 .course-info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    margin-bottom: 30px;
+    gap: 20px;
 }
 
 /* Info cards */
@@ -686,13 +682,15 @@ tr:hover {
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
     border-left: 4px solid #a84300;
+    margin-bottom: 20px;
 }
 
 /* Card headings */
 .info-card h3 {
     color: #a84300;
     font-size: 1.2rem;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+    text-align: center;
 }
 
 /* Label/value styling */
@@ -705,11 +703,8 @@ tr:hover {
 }
 
 .info-item strong {
-    width: 130px; /* ⬅️ adjust as needed for longest label */
     flex-shrink: 0;
     color: #222;
-    font-weight: 600;
-    text-align: right;
 }
 
 /* Prerequisites */
