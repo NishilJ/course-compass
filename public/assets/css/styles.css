@@ -110,7 +110,9 @@ html {
     font-weight: 500;
     text-decoration: none;
     display: block;
+    text-align: center;
     transition: all 0.2s ease;
+    
 }
 
 .dropdown-content a:hover {
