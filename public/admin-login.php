@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+require_once 'db.php';  // Include your database connection
+
 // If already logged in as admin, redirect to dashboard
 if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
     header('Location: admin-dashboard.php');
@@ -13,20 +15,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    // Simple admin credentials (in production, use hashed passwords from database)
-    $admin_username = 'admin';
-    $admin_password = 'admin123'; // Change this to a secure password
+    // Prepare and execute query to get user by username
+    $stmt = $conn->prepare("SELECT password FROM users WHERE username = ?");
+    $stmt->bind_param('s', $username);
+    $stmt->execute();
+    $stmt->store_result();
 
-    if ($username === $admin_username && $password === $admin_password) {
-        $_SESSION['admin_logged_in'] = true;
-        $_SESSION['admin_username'] = $username;
-        header('Location: admin-dashboard.php');
-        exit();
+    if ($stmt->num_rows === 1) {
+        $stmt->bind_result($db_password);
+        $stmt->fetch();
+
+        // Since passwords are plain text, directly compare
+        if ($password === $db_password) {
+            $_SESSION['admin_logged_in'] = true;
+            $_SESSION['admin_username'] = $username;
+            header('Location: admin-dashboard.php');
+            exit();
+        } else {
+            $error_message = 'Invalid username or password.';
+        }
     } else {
         $error_message = 'Invalid username or password.';
     }
+
+    $stmt->close();
 }
+
+$conn->close();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -164,21 +181,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="POST" action="" id="loginForm">
             <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" required maxlength="50"
-                    placeholder="Enter admin username" pattern="[A-Za-z0-9_]+"
-                    title="Only letters, numbers, and underscores allowed"
-                    value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>">
+                <input type="text" id="username" name="username" required
+                    placeholder="Enter admin username" pattern="[A-Za-z0-9_]+">
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required minlength="6" maxlength="100"
-                    placeholder="Enter admin password" title="Password must be at least 6 characters long">
+                <input type="password" id="password" name="password" required
+                    placeholder="Enter admin password">
             </div>
 
             <button type="submit" class="login-btn">Login</button>
         </form>
 
+        
         <script>
             // Real-time validation for username
             document.getElementById('username').addEventListener('input', function(e) {
@@ -217,23 +233,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 username.classList.remove('invalid');
                 password.classList.remove('invalid');
 
-                if (username.value.length < 3) {
-                    username.classList.add('invalid');
-                    if (!hasErrors) {
-                        alert('Username must be at least 3 characters long');
-                        username.focus();
-                    }
-                    hasErrors = true;
-                }
-
-                if (password.value.length < 6) {
-                    password.classList.add('invalid');
-                    if (!hasErrors) {
-                        alert('Password must be at least 6 characters long');
-                        password.focus();
-                    }
-                    hasErrors = true;
-                }
 
                 if (hasErrors) {
                     e.preventDefault();
