@@ -1033,7 +1033,6 @@ td .btn:last-child {
 td:last-child {
     text-align: center;
     vertical-align: middle;
-    white-space: nowrap;
 }
 
 /* Override button styles specifically for table actions */
