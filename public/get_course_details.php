@@ -161,35 +161,6 @@ if (isset($_GET['course_id'])) {
                                 <?php
                             }
                             ?>
-                            <div class="info-item">
-                                <strong>Courses Taught:</strong>
-                                <?php
-                                // Show courses taught by this instructor (now inside the Instructor Information card)
-                                if (!empty($course['instructor_id'])) {
-                                    $courses_sql = "SELECT DISTINCT 
-                                                        CONCAT(c.course_prefix, ' ', c.course_number) as course_code, 
-                                                        c.course_title
-                                                    FROM section s
-                                                    JOIN course c ON s.course_id = c.course_id
-                                                    WHERE s.instructor_id = ?";
-                                    $courses_stmt = $conn->prepare($courses_sql);
-                                    $courses_stmt->bind_param('i', $course['instructor_id']);
-                                    $courses_stmt->execute();
-                                    $courses_result = $courses_stmt->get_result();
-                                    if ($courses_result->num_rows > 0) {
-                                        $results = [];
-                                        while ($taught = $courses_result->fetch_assoc()) {
-                                            $results[] = htmlspecialchars($taught['course_code']) . ' - ' . htmlspecialchars($taught['course_title']);
-                                        }
-                                        if (!empty($results)) {
-                                            echo implode(', ', $results);
-                                        }
-                                    }
-
-                                    $courses_stmt->close();
-                                }
-                                ?>
-                            </div>
                         <?php else: ?>
                             <div class="info-item">TBD</div>
                         <?php endif; ?>
