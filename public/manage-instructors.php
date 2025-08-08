@@ -14,7 +14,15 @@ function importInstructorsFromCSV($conn, $csvFile) {
     $errors = 0;
     
     if (($handle = fopen($csvFile, "r")) !== FALSE) {
+        $rowNum = 0;
         while (($data = fgetcsv($handle, 1000, ",", '"', "\\")) !== FALSE) {
+            $rowNum++;
+            
+            // Skip header row
+            if ($rowNum === 1) {
+                continue;
+            }
+            
             if (count($data) >= 6) {
                 $instructor_id = intval($data[0]);
                 $instructor_name = trim($data[1]);
@@ -32,6 +40,8 @@ function importInstructorsFromCSV($conn, $csvFile) {
                     $errors++;
                 }
                 $stmt->close();
+            } else {
+                $errors++;
             }
         }
         fclose($handle);
@@ -152,17 +162,97 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'delete':
                 $instructor_id = intval($_POST['instructor_id']);
                 if ($instructor_id > 0) {
-                    $stmt = $conn->prepare("DELETE FROM instructor WHERE instructor_id = ?");
-                    $stmt->bind_param('i', $instructor_id);
+                    // First check if there are any sections using this instructor
+                    $check_stmt = $conn->prepare("SELECT COUNT(*) as section_count FROM section WHERE instructor_id = ?");
+                    $check_stmt->bind_param('i', $instructor_id);
+                    $check_stmt->execute();
+                    $result = $check_stmt->get_result();
+                    $section_count = $result->fetch_assoc()['section_count'];
+                    $check_stmt->close();
                     
-                    if ($stmt->execute()) {
-                        $message = 'Instructor deleted successfully!';
-                        $message_type = 'success';
+                    // Also check for ratings tied to this instructor
+                    $rating_stmt = $conn->prepare("SELECT COUNT(*) as rating_count FROM rating WHERE instructor_id = ?");
+                    $rating_stmt->bind_param('i', $instructor_id);
+                    $rating_stmt->execute();
+                    $rating_result = $rating_stmt->get_result();
+                    $rating_count = $rating_result->fetch_assoc()['rating_count'];
+                    $rating_stmt->close();
+                    
+                    if ($section_count > 0 || $rating_count > 0) {
+                        // Check if cascade delete is requested
+                        if (isset($_POST['cascade_delete']) && $_POST['cascade_delete'] === 'yes') {
+                            // Start transaction for safe cascade delete
+                            $conn->autocommit(FALSE);
+                            
+                            try {
+                                // First delete ratings for this instructor
+                                $rating_delete = $conn->prepare("DELETE FROM rating WHERE instructor_id = ?");
+                                $rating_delete->bind_param('i', $instructor_id);
+                                $rating_delete->execute();
+                                $ratings_deleted = $rating_delete->affected_rows;
+                                $rating_delete->close();
+                                
+                                // Then delete sections for this instructor
+                                $section_delete = $conn->prepare("DELETE FROM section WHERE instructor_id = ?");
+                                $section_delete->bind_param('i', $instructor_id);
+                                $section_delete->execute();
+                                $sections_deleted = $section_delete->affected_rows;
+                                $section_delete->close();
+                                
+                                // Finally delete the instructor
+                                $instructor_delete = $conn->prepare("DELETE FROM instructor WHERE instructor_id = ?");
+                                $instructor_delete->bind_param('i', $instructor_id);
+                                $instructor_delete->execute();
+                                $instructor_delete->close();
+                                
+                                // Commit transaction
+                                $conn->commit();
+                                $conn->autocommit(TRUE);
+                                
+                                $deleted_items = [];
+                                if ($sections_deleted > 0) $deleted_items[] = "{$sections_deleted} section(s)";
+                                if ($ratings_deleted > 0) $deleted_items[] = "{$ratings_deleted} rating(s)";
+                                
+                                $message = "Instructor deleted successfully!";
+                                if (!empty($deleted_items)) {
+                                    $message .= " Also deleted " . implode(" and ", $deleted_items) . ".";
+                                } else {
+                                    $message .= " No related sections or ratings were found.";
+                                }
+                                $message_type = 'success';
+                                
+                            } catch (Exception $e) {
+                                // Rollback on error
+                                $conn->rollback();
+                                $conn->autocommit(TRUE);
+                                $message = 'Error during cascade delete: ' . $e->getMessage();
+                                $message_type = 'error';
+                            }
+                        } else {
+                            $dependencies = [];
+                            if ($section_count > 0) {
+                                $dependencies[] = "{$section_count} section(s)";
+                            }
+                            if ($rating_count > 0) {
+                                $dependencies[] = "{$rating_count} rating(s)";
+                            }
+                            $message = "Cannot delete instructor: " . implode(" and ", $dependencies) . " are still linked to this instructor. Check 'Force Delete' to delete the instructor and all linked data.";
+                            $message_type = 'error';
+                        }
                     } else {
-                        $message = 'Error deleting instructor: ' . $conn->error;
-                        $message_type = 'error';
+                        // Safe to delete the instructor
+                        $stmt = $conn->prepare("DELETE FROM instructor WHERE instructor_id = ?");
+                        $stmt->bind_param('i', $instructor_id);
+                        
+                        if ($stmt->execute()) {
+                            $message = 'Instructor deleted successfully!';
+                            $message_type = 'success';
+                        } else {
+                            $message = 'Error deleting instructor: ' . $conn->error;
+                            $message_type = 'error';
+                        }
+                        $stmt->close();
                     }
-                    $stmt->close();
                 }
                 break;
         }
@@ -384,6 +474,14 @@ $instructors_result = $conn->query($instructors_query);
             <form method="POST" id="deleteForm">
                 <input type="hidden" name="action" value="delete">
                 <input type="hidden" name="instructor_id" id="delete_instructor_id">
+                
+                <div style="margin: 15px 20px; padding: 10px; background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
+                    <label style="display: flex; align-items: center; font-size: 14px; color: #856404;">
+                        <input type="checkbox" name="cascade_delete" value="yes" style="margin-right: 8px;">
+                        <strong>Force Delete:</strong> Also delete all sections and ratings associated with this instructor
+                    </label>
+                    <small style="color: #6c757d; margin-left: 24px;">Use this if the instructor has sections or ratings that you want to remove as well.</small>
+                </div>
                 
                 <div class="modal-footer">
                     <button type="button" onclick="closeDeleteModal()" class="btn btn-secondary">Cancel</button>

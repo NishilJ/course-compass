@@ -14,7 +14,15 @@ function importCoursesFromCSV($conn, $csvFile) {
     $errors = 0;
     
     if (($handle = fopen($csvFile, "r")) !== FALSE) {
+        $rowNum = 0;
         while (($data = fgetcsv($handle, 1000, ",", '"', "\\")) !== FALSE) {
+            $rowNum++;
+            
+            // Skip header row
+            if ($rowNum === 1) {
+                continue;
+            }
+            
             if (count($data) >= 6) {
                 $course_id = intval($data[0]);
                 $course_prefix = trim($data[1]);
@@ -33,6 +41,8 @@ function importCoursesFromCSV($conn, $csvFile) {
                     $errors++;
                 }
                 $stmt->close();
+            } else {
+                $errors++;
             }
         }
         fclose($handle);
@@ -163,17 +173,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'delete':
                 $course_id = intval($_POST['course_id']);
                 if ($course_id > 0) {
-                    $stmt = $conn->prepare("DELETE FROM course WHERE course_id = ?");
-                    $stmt->bind_param('i', $course_id);
+                    // Check if there are any sections using this course
+                    $check_stmt = $conn->prepare("SELECT COUNT(*) as section_count FROM section WHERE course_id = ?");
+                    $check_stmt->bind_param('i', $course_id);
+                    $check_stmt->execute();
+                    $result = $check_stmt->get_result();
+                    $section_count = $result->fetch_assoc()['section_count'];
+                    $check_stmt->close();
                     
-                    if ($stmt->execute()) {
-                        $message = 'Course deleted successfully!';
-                        $message_type = 'success';
+                    if ($section_count > 0) {
+                        // Check if cascade delete is requested
+                        if (isset($_POST['cascade_delete']) && $_POST['cascade_delete'] === 'yes') {
+                            // Start transaction for safe cascade delete
+                            $conn->autocommit(FALSE);
+                            
+                            try {
+                                // Delete sections for this course
+                                $section_delete = $conn->prepare("DELETE FROM section WHERE course_id = ?");
+                                $section_delete->bind_param('i', $course_id);
+                                $section_delete->execute();
+                                $sections_deleted = $section_delete->affected_rows;
+                                $section_delete->close();
+                                
+                                // Finally delete the course
+                                $course_delete = $conn->prepare("DELETE FROM course WHERE course_id = ?");
+                                $course_delete->bind_param('i', $course_id);
+                                $course_delete->execute();
+                                $course_delete->close();
+                                
+                                // Commit transaction
+                                $conn->commit();
+                                $conn->autocommit(TRUE);
+                                
+                                $message = "Course deleted successfully! Also deleted {$sections_deleted} section(s).";
+                                $message_type = 'success';
+                                
+                            } catch (Exception $e) {
+                                // Rollback on error
+                                $conn->rollback();
+                                $conn->autocommit(TRUE);
+                                $message = 'Error during cascade delete: ' . $e->getMessage();
+                                $message_type = 'error';
+                            }
+                        } else {
+                            $message = "Cannot delete course: {$section_count} section(s) are still using this course. Check 'Force Delete' to delete the course and all its sections.";
+                            $message_type = 'error';
+                        }
                     } else {
-                        $message = 'Error deleting course.';
-                        $message_type = 'error';
+                        // Safe to delete the course
+                        $stmt = $conn->prepare("DELETE FROM course WHERE course_id = ?");
+                        $stmt->bind_param('i', $course_id);
+                        
+                        if ($stmt->execute()) {
+                            $message = 'Course deleted successfully!';
+                            $message_type = 'success';
+                        } else {
+                            $message = 'Error deleting course: ' . $conn->error;
+                            $message_type = 'error';
+                        }
+                        $stmt->close();
                     }
-                    $stmt->close();
                 }
                 break;
         }
@@ -403,6 +462,14 @@ $courses_result = $conn->query($courses_query);
             <form method="POST" id="deleteForm">
                 <input type="hidden" name="action" value="delete">
                 <input type="hidden" name="course_id" id="delete_course_id">
+                
+                <div style="margin: 15px 20px; padding: 10px; background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
+                    <label style="display: flex; align-items: center; font-size: 14px; color: #856404;">
+                        <input type="checkbox" name="cascade_delete" value="yes" style="margin-right: 8px;">
+                        <strong>Force Delete:</strong> Also delete all sections associated with this course
+                    </label>
+                    <small style="color: #6c757d; margin-left: 24px;">Use this if the course has sections that you want to remove as well.</small>
+                </div>
                 
                 <div class="modal-footer">
                     <button type="button" onclick="closeDeleteModal()" class="btn btn-secondary">Cancel</button>

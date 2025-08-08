@@ -18,9 +18,13 @@ function importSectionsFromCSV($conn, $csvFile) {
         while (($data = fgetcsv($handle, 1000, ",", '"', "\\")) !== FALSE) {
             $rowNum++;
 
+            // Skip header row
+            if ($rowNum === 1) {
+                continue;
+            }
+
             // Skip empty or malformed rows
             if (count($data) < 11) {
-                echo "<p style='color: orange;'>Row $rowNum skipped: not enough columns.</p>";
                 $errors++;
                 continue;
             }
@@ -37,34 +41,26 @@ function importSectionsFromCSV($conn, $csvFile) {
             $start_date = trim($data[9]);
             $end_date = trim($data[10]);
 
-            $stmt = $conn->prepare("INSERT INTO section 
-                (section_id, course_id,instructor_id, location, capacity, term, start_time, end_time, days, start_date, end_date)
+            $stmt = $conn->prepare("INSERT IGNORE INTO section 
+                (section_id, course_id, instructor_id, location, capacity, term, start_time, end_time, days, start_date, end_date)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             if (!$stmt) {
-                echo "<p style='color: red;'>Prepare failed: " . htmlspecialchars($conn->error) . "</p>";
                 $errors++;
                 continue;
             }
 
             $stmt->bind_param(
                 'iiissssssss',
-                $section_id, $instructor_id, $course_id, $location, $capacity, $term,
+                $section_id, $course_id, $instructor_id, $location, $capacity, $term,
                 $start_time, $end_time, $days, $start_date, $end_date
             );
 
-            if ($stmt->execute()) {
-                if ($stmt->affected_rows > 0) {
-                    $success++;
-                } else {
-                    echo "<p style='color: orange;'>Row $rowNum skipped: no rows affected (likely duplicate section_id).</p>";
-                    $errors++;
-                }
+            if ($stmt->execute() && $conn->affected_rows > 0) {
+                $success++;
             } else {
-                echo "<p style='color: red;'>Row $rowNum insert failed: " . htmlspecialchars($stmt->error) . "</p>";
                 $errors++;
             }
-
             $stmt->close();
         }
         fclose($handle);
@@ -169,6 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'delete':
                 $section_id = intval($_POST['section_id']);
                 if ($section_id > 0) {
+                    // Sections can be deleted directly as they don't have dependent records
                     $stmt = $conn->prepare("DELETE FROM section WHERE section_id = ?");
                     $stmt->bind_param('i', $section_id);
                     
@@ -176,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $message = 'Section deleted successfully!';
                         $message_type = 'success';
                     } else {
-                        $message = 'Error deleting section.';
+                        $message = 'Error deleting section: ' . $conn->error;
                         $message_type = 'error';
                     }
                     $stmt->close();
