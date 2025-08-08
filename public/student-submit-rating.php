@@ -1,342 +1,261 @@
 <?php
 session_start();
+
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+require_once 'db.php';
+
 $message = '';
 $message_type = '';
 
-function normalize($str) {
-    if (!is_string($str)) return $str;
-    $bom = "\xEF\xBB\xBF";
-    if (strpos($str, $bom) === 0) {
-        $str = substr($str, 3);
+try {
+    $stmt = $conn->prepare("
+        SELECT
+          `COL 1` AS instructor_id,
+          `COL 2` AS instructor_name
+        FROM `instructor`
+        ORDER BY `COL 2`
+    ");
+    $stmt->execute();
+    $stmt->bind_result($instr_id, $instr_name);
+
+    $instructors = [];
+    while ($stmt->fetch()) {
+        $instructors[$instr_id] = $instr_name;
     }
-    return trim($str);
+    $stmt->close();
+} catch (mysqli_sql_exception $e) {
+    die("Error fetching instructors: " . $e->getMessage());
 }
 
-function readCsv($filepath) {
-    $rows = [];
-    if (!file_exists($filepath)) {
-        return $rows;
-    }
-    if (($handle = fopen($filepath, "r")) !== FALSE) {
-        while (($data = fgetcsv($handle, 1000, ",", '"', "\\")) !== FALSE) {
-            $data = array_map(fn($v) => is_string($v) ? normalize($v) : $v, $data);
-            $rows[] = $data;
-        }
-        fclose($handle);
-    }
-    return $rows;
-}
-
-$baseDataDir = realpath(__DIR__ . '/../data');
-$instructorCsv = $baseDataDir . '/Instructor.csv';
-$ratingCsv = $baseDataDir . '/Rating.csv';
-
-$instructors = []; 
-$raw_instructors = readCsv($instructorCsv);
-foreach ($raw_instructors as $row) {
-    if (count($row) < 2) continue;
-    $instr_id = $row[0];
-    $name = $row[1];
-    $instructors[$instr_id] = $name;
-}
-
-$instructorRatings = []; 
+$instructorRatings = [];
 foreach ($instructors as $id => $name) {
     $instructorRatings[$id] = [
-        'ratings' => [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0],
-        'total' => 0,
+        'ratings' => [1=>0,2=>0,3=>0,4=>0,5=>0],
+        'total'   => 0,
     ];
-}
-$raw_ratings = readCsv($ratingCsv);
-foreach ($raw_ratings as $row) {
-    if (count($row) < 4) continue;
-    $instructor_id = $row[1];
-    $rating_number = intval($row[2]);
-    if (!isset($instructorRatings[$instructor_id])) continue;
-    if ($rating_number < 1 || $rating_number > 5) continue;
-    $instructorRatings[$instructor_id]['ratings'][$rating_number]++;
-    $instructorRatings[$instructor_id]['total']++;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $instructor_id = isset($_POST['instructor_id']) ? normalize($_POST['instructor_id']) : '';
-    $rating_number = isset($_POST['rating_number']) ? intval($_POST['rating_number']) : 0;
-    $student_grade = isset($_POST['student_grade']) ? normalize($_POST['student_grade']) : '';
+    $instructor_id = $_POST['instructor_id']      ?? '';
+    $rating_number = intval($_POST['rating_number'] ?? 0);
+    $student_grade = $_POST['student_grade']      ?? '';
 
-    if ($instructor_id === '' || !isset($instructors[$instructor_id])) {
+    if (! isset($instructors[$instructor_id])) {
         $message = 'Please select a valid instructor.';
         $message_type = 'error';
     } elseif ($rating_number < 1 || $rating_number > 5) {
         $message = 'Please select a rating between 1 and 5.';
         $message_type = 'error';
-    } elseif (!in_array($student_grade, ['A','B','C','D','F','N/A'], true)) {
+    } elseif (! in_array($student_grade, ['A','B','C','D','F','N/A'], true)) {
         $message = 'Please select a valid grade.';
         $message_type = 'error';
     } else {
-        $existing = readCsv($ratingCsv);
-        $max_id = 0;
-        foreach ($existing as $row) {
-            if (isset($row[0]) && is_numeric($row[0])) {
-                $id = intval($row[0]);
-                if ($id > $max_id) $max_id = $id;
-            }
-        }
-        $next_id = $max_id + 1;
-        $new_row = [$next_id, $instructor_id, $rating_number, $student_grade];
-
-        $fp = fopen($ratingCsv, 'a');
-        if ($fp) {
-            if (flock($fp, LOCK_EX)) {
-                fputcsv($fp, $new_row);
-                fflush($fp);
-                flock($fp, LOCK_UN);
-                $message = 'Rating submitted successfully.';
-                $message_type = 'success';
-                if (isset($instructorRatings[$instructor_id])) {
-                    $instructorRatings[$instructor_id]['ratings'][$rating_number]++;
-                    $instructorRatings[$instructor_id]['total']++;
-                }
-            } else {
-                $message = 'Could not lock rating file for writing.';
-                $message_type = 'error';
-            }
-            fclose($fp);
-        } else {
-            $message = 'Failed to open rating storage.';
+        try {
+            $ins = $conn->prepare("
+                INSERT INTO `rating`
+                  (`COL 2`,`COL 3`,`COL 4`)
+                VALUES (?,?,?)
+            ");
+            $ins->bind_param("iis", $instructor_id, $rating_number, $student_grade);
+            $ins->execute();
+            $ins->close();
+            $message = 'Rating submitted successfully.';
+            $message_type = 'success';
+        } catch (mysqli_sql_exception $e) {
+            $message = 'Database error: ' . $e->getMessage();
             $message_type = 'error';
         }
     }
+}
+
+try {
+    $stat = $conn->prepare("
+        SELECT
+          `COL 2` AS instructor_id,
+          `COL 3` AS rating_number,
+          COUNT(*) AS cnt
+        FROM `rating`
+        GROUP BY `COL 2`, `COL 3`
+    ");
+    $stat->execute();
+    $stat->bind_result($iid, $rnum, $cnt);
+
+    while ($stat->fetch()) {
+        if (isset($instructorRatings[$iid])) {
+            $instructorRatings[$iid]['ratings'][(int)$rnum] = (int)$cnt;
+            $instructorRatings[$iid]['total']   += (int)$cnt;
+        }
+    }
+    $stat->close();
+} catch (mysqli_sql_exception $e) {
+    die("Error fetching rating stats: " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Submit Rating - Course Compass</title>
-<link rel="stylesheet" href="assets/css/styles.css" />
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-    .page-header h1 { margin:0; font-size: 1.8rem; color: #8b4000; }
-    .back-btn {
-        text-decoration: none;
-        background: #555;
-        color: #fff;
-        padding: 10px 16px;
-        border-radius: 5px;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 0.9rem;
-    }
-    .form-card {
-        background: #fff;
-        border-radius: 8px;
-        padding: 24px;
-        box-shadow: 0 4px 18px rgba(0,0,0,0.08);
-        margin-top: 20px;
-    }
-    .selector-row { display: flex; gap: 16px; flex-wrap: wrap; }
-    .form-group { margin-bottom: 18px; flex:1; min-width:150px; }
-    label { font-weight: 600; display: block; margin-bottom: 6px; }
-    select { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; appearance: none; }
-    .btn-primary {
-        background: #a35200;
-        color: #fff;
-        border: none;
-        padding: 10px 18px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 1rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        margin-top: 4px;
-    }
-    .btn-primary:hover { filter: brightness(1.05); }
-    .message { padding: 12px 16px; border-radius: 5px; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
-    .message.success { background: #e6f7ed; border: 1px solid #2f8f4e; color: #1f4f2f; }
-    .message.error { background: #ffe6e6; border: 1px solid #b33a3a; color: #5f1f1f; }
-    .chart-container { margin-top: 20px; display: flex; gap: 30px; flex-wrap: wrap; }
-    .chart-box {
-        flex: 1 1 340px;
-        background: #fafafa;
-        padding: 16px;
-        border-radius: 6px;
-        border: 1px solid #e2e8f0;
-    }
-    .chart-title { font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-    .small-note { font-size: 0.85rem; color: #555; margin-top: 4px; }
-</style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Submit Rating – Course Compass</title>
+  <link rel="stylesheet" href="assets/css/styles.css"/>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <?php include 'navbar.php'; ?>
+  <?php include 'navbar.php'; ?>
 
-    <div class="container">
-        <div class="page-header">
-            <h1><i class="material-icons" style="vertical-align: middle; margin-right: 8px;">rate_review</i>Submit Instructor Rating</h1>
-<a href="javascript:history.back()" class="back-btn">
-    <i class="material-icons" style="vertical-align: middle; margin-right:5px;">arrow_back</i>
-    Go Back
-</a>
-        </div>
-
-        <div class="form-card">
-            <?php if (!empty($message)): ?>
-                <div class="message <?php echo htmlspecialchars($message_type); ?>">
-                    <i class="material-icons">
-                        <?php echo $message_type === 'success' ? 'check_circle' : 'error'; ?>
-                    </i>
-                    <div><?php echo htmlspecialchars($message); ?></div>
-                </div>
-            <?php endif; ?>
-
-            <form method="POST" id="rating-form" novalidate>
-                <div class="selector-row">
-                    <div class="form-group">
-                        <label for="instructor_id">Instructor</label>
-                        <select name="instructor_id" id="instructor_id" required>
-                            <option value="">-- Select Instructor --</option>
-                            <?php foreach ($instructors as $id => $name): ?>
-                                <option value="<?php echo htmlspecialchars($id); ?>" <?php if (isset($_POST['instructor_id']) && $_POST['instructor_id'] === $id) echo 'selected'; ?>>
-                                    <?php echo htmlspecialchars($name); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="rating_number">Rating (1-5)</label>
-                        <select name="rating_number" id="rating_number" required>
-                            <?php for ($i = 1; $i <=5; $i++): ?>
-                                <option value="<?php echo $i; ?>" <?php if (isset($_POST['rating_number']) && intval($_POST['rating_number']) === $i) echo 'selected'; ?>>
-                                    <?php echo $i; ?>
-                                </option>
-                            <?php endfor; ?>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="student_grade">Your Grade</label>
-                        <select name="student_grade" id="student_grade" required>
-                            <?php
-                            $grades = ['A','B','C','D','F','N/A'];
-                            foreach ($grades as $g): ?>
-                                <option value="<?php echo $g; ?>" <?php if (isset($_POST['student_grade']) && $_POST['student_grade'] === $g) echo 'selected'; ?>>
-                                    <?php echo $g; ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-primary">
-                    <i class="material-icons" style="vertical-align: middle; margin-right:5px;">send</i>
-                    Submit Rating
-                </button>
-            </form>
-
-            <div class="chart-container">
-                <div class="chart-box">
-                    <div class="chart-title">
-                        <i class="material-icons" style="vertical-align: middle;">bar_chart</i>
-                        <div>Selected Instructor Rating Distribution</div>
-                    </div>
-                    <canvas id="instructor-chart" aria-label="Rating distribution" role="img" style="max-height:220px;"></canvas>
-                    <div class="small-note">Shows percentage of ratings 1–5 for the selected instructor.</div>
-                </div>
-            </div>
-        </div>
+  <div class="container">
+    <div class="page-header">
+      <h1>
+        <i class="material-icons" style="vertical-align:middle;margin-right:8px;">
+          rate_review
+        </i>
+        Submit Instructor Rating
+      </h1>
+      <a href="javascript:history.back()" class="back-btn">
+        <i class="material-icons" style="vertical-align:middle;margin-right:5px;">
+          arrow_back
+        </i>
+        Go Back
+      </a>
     </div>
 
-<script>
+    <div class="form-card">
+      <?php if ($message): ?>
+        <div class="message <?php echo htmlspecialchars($message_type); ?>">
+          <i class="material-icons">
+            <?php echo $message_type==='success'?'check_circle':'error'; ?>
+          </i>
+          <div><?php echo htmlspecialchars($message); ?></div>
+        </div>
+      <?php endif; ?>
+
+      <form method="POST" id="rating-form" novalidate>
+        <div class="selector-row">
+          <div class="form-group">
+            <label for="instructor_id">Instructor</label>
+            <select name="instructor_id" id="instructor_id" required>
+              <option value="">-- Select Instructor --</option>
+              <?php foreach ($instructors as $id => $name): ?>
+                <option value="<?php echo htmlspecialchars($id); ?>"
+                  <?php if (($_POST['instructor_id'] ?? '') === $id) echo 'selected'; ?>>
+                  <?php echo htmlspecialchars($name); ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="rating_number">Rating (1–5)</label>
+            <select name="rating_number" id="rating_number" required>
+              <option value="">Select rating</option>
+              <?php for ($i=1; $i<=5; $i++): ?>
+                <option value="<?php echo $i; ?>"
+                  <?php if ((int)($_POST['rating_number'] ?? 0) === $i) echo 'selected'; ?>>
+                  <?php echo $i; ?>
+                </option>
+              <?php endfor; ?>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="student_grade">Your Grade</label>
+            <select name="student_grade" id="student_grade" required>
+              <option value="">Select grade</option>
+              <?php foreach (['A','B','C','D','F','N/A'] as $g): ?>
+                <option value="<?php echo $g; ?>"
+                  <?php if (($_POST['student_grade'] ?? '') === $g) echo 'selected'; ?>>
+                  <?php echo $g; ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary">
+          <i class="material-icons" style="vertical-align:middle;margin-right:5px;">
+            send
+          </i>
+          Submit Rating
+        </button>
+      </form>
+
+      <div class="chart-container">
+        <div class="chart-box">
+          <div class="chart-title">
+            <i class="material-icons">bar_chart</i>
+            <div>Selected Instructor Rating Distribution</div>
+          </div>
+          <canvas id="instructor-chart"
+                  aria-label="Rating distribution"
+                  role="img"
+                  style="max-height:220px;"></canvas>
+          <div class="small-note">
+            Shows percentage of ratings 1–5 for the selected instructor.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
     const instructorRatingsMap = {};
-    <?php
-        foreach ($instructorRatings as $id => $info) {
-            $ratings = [
-                intval($info['ratings'][1] ?? 0),
-                intval($info['ratings'][2] ?? 0),
-                intval($info['ratings'][3] ?? 0),
-                intval($info['ratings'][4] ?? 0),
-                intval($info['ratings'][5] ?? 0),
-            ];
-            $total = intval($info['total'] ?? 0);
-            $jsId = json_encode($id);
-            $jsRatings = json_encode($ratings);
-            echo "instructorRatingsMap[$jsId] = { ratings: $jsRatings, total: $total };\n";
-        }
+    <?php foreach ($instructorRatings as $id => $info):
+        $jsRatings = json_encode(array_values($info['ratings']));
+        $jsTotal   = json_encode($info['total']);
     ?>
+    instructorRatingsMap[<?php echo json_encode($id); ?>] = {
+      ratings: <?php echo $jsRatings; ?>,
+      total:   <?php echo $jsTotal; ?>
+    };
+    <?php endforeach; ?>
 
     function computePercentages(ratings, total) {
-        if (total === 0) {
-            return [0,0,0,0,0];
-        }
-        return ratings.map(c => Math.round((c / total) * 100));
+      return total
+        ? ratings.map(c => Math.round((c/total)*100))
+        : [0,0,0,0,0];
     }
 
     const ctx = document.getElementById('instructor-chart');
-    const initialData = {
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
         labels: ['1','2','3','4','5'],
-        datasets: [{
-            label: '% of Ratings',
-            data: [0,0,0,0,0],
-            borderWidth: 1
-        }]
-    };
-    const chartOptions = {
+        datasets: [{ label: '% of Ratings', data:[0,0,0,0,0], borderWidth:1 }]
+      },
+      options: {
         responsive: true,
         scales: {
-            x: { title: { display: true, text: 'Rating' } },
-            y: {
-                beginAtZero: true,
-                max: 100,
-                ticks: { callback: v => v + '%' },
-                title: { display: true, text: 'Percent' }
-            }
+          x: { title:{display:true,text:'Rating'} },
+          y: {
+            beginAtZero:true,
+            max:100,
+            ticks:{ callback: v => v + '%' },
+            title:{display:true,text:'Percent'}
+          }
         },
         plugins: {
-            legend: { display: false },
-            tooltip: {
-                callbacks: {
-                    label: ctx => ctx.parsed.y + '%'
-                }
-            }
+          legend:{display:false},
+          tooltip:{ callbacks:{ label: ctx => ctx.parsed.y + '%' } }
         }
-    };
-    let instructorChart = new Chart(ctx, {
-        type: 'bar',
-        data: initialData,
-        options: chartOptions
+      }
     });
 
-    function updateChartForInstructor(instructorId) {
-        const entry = instructorRatingsMap[instructorId];
-        let perc = [0,0,0,0,0];
-        if (entry) {
-            perc = computePercentages(entry.ratings, entry.total);
-        }
-        instructorChart.data.datasets[0].data = perc;
-        instructorChart.update();
-    }
-
-    document.getElementById('instructor_id').addEventListener('change', function() {
-        const sel = this.value;
-        updateChartForInstructor(sel);
-    });
+    document.getElementById('instructor_id')
+      .addEventListener('change', function() {
+        const d = instructorRatingsMap[this.value] || {ratings:[0,0,0,0,0],total:0};
+        chart.data.datasets[0].data = computePercentages(d.ratings, d.total);
+        chart.update();
+      });
 
     window.addEventListener('DOMContentLoaded', () => {
-        const sel = document.getElementById('instructor_id').value;
-        updateChartForInstructor(sel);
-        console.log('InstructorRatingsMap:', instructorRatingsMap, 'Initial selection:', sel);
+      const sel = document.getElementById('instructor_id').value;
+      if (sel) {
+        const d = instructorRatingsMap[sel] || {ratings:[0,0,0,0,0],total:0};
+        chart.data.datasets[0].data = computePercentages(d.ratings, d.total);
+        chart.update();
+      }
     });
-</script>
+  </script>
 </body>
 </html>
