@@ -69,6 +69,26 @@ function importSectionsFromCSV($conn, $csvFile) {
     return ['success' => $success, 'errors' => $errors];
 }
 
+// Generate time options in 15-minute intervals
+function getTimeOptions($selectedTime = '') {
+    $options = '<option value="">Select Time</option>';
+    
+    // Generate times from 8:00 AM to 10:00 PM in 15-minute intervals
+    for ($hour = 8; $hour <= 22; $hour++) {
+        for ($minute = 0; $minute < 60; $minute += 15) {
+            $time24 = sprintf('%02d:%02d', $hour, $minute);
+            
+            // Convert to 12-hour format for display
+            $time12 = date('g:i A', strtotime($time24));
+            
+            $selected = ($selectedTime === $time24) ? 'selected' : '';
+            $options .= "<option value=\"{$time24}\" {$selected}>{$time12}</option>";
+        }
+    }
+    
+    return $options;
+}
+
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
@@ -77,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $course_id = intval($_POST['course_id']);
                 $instructor_id = intval($_POST['instructor_id']);
                 $term = trim($_POST['term']);
-                $location = trim($_POST['location']) ?: 'UTD';
+                $location = trim($_POST['location']) ?: 'ECSW 1.365, etc.';
                 $capacity = intval($_POST['capacity']) ?: NULL;
                 $start_time = trim($_POST['start_time']) ?: NULL;
                 $end_time = trim($_POST['end_time']) ?: NULL;
@@ -122,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $course_id = intval($_POST['course_id']);
                 $instructor_id = intval($_POST['instructor_id']);
                 $term = trim($_POST['term']);
-                $location = trim($_POST['location']) ?: 'UTD';
+                $location = trim($_POST['location']) ?: 'ECSW 1.365, etc.';
                 $capacity = intval($_POST['capacity']) ?: NULL;
                 $start_time = trim($_POST['start_time']) ?: NULL;
                 $end_time = trim($_POST['end_time']) ?: NULL;
@@ -277,7 +297,7 @@ $sections_result = $conn->query($sections_query);
                     </div>
                     <div class="form-group">
                         <label for="location">Location</label>
-                        <input type="text" id="location" name="location" placeholder="UTD" maxlength="255">
+                        <input type="text" id="location" name="location" placeholder="ECSW 1.365, etc." maxlength="255">
                     </div>
                     <div class="form-group">
                         <label for="capacity">Capacity</label>
@@ -289,11 +309,15 @@ $sections_result = $conn->query($sections_query);
                     </div>
                     <div class="form-group">
                         <label for="start_time">Start Time</label>
-                        <input type="time" id="start_time" name="start_time">
+                        <select id="start_time" name="start_time">
+                            <?php echo getTimeOptions(); ?>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="end_time">End Time</label>
-                        <input type="time" id="end_time" name="end_time">
+                        <select id="end_time" name="end_time">
+                            <?php echo getTimeOptions(); ?>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="start_date">Start Date</label>
@@ -425,7 +449,7 @@ $sections_result = $conn->query($sections_query);
                     </div>
                     <div class="form-group">
                         <label for="edit_location">Location</label>
-                        <input type="text" id="edit_location" name="location" placeholder="UTD" maxlength="255">
+                        <input type="text" id="edit_location" name="location" placeholder="ECSW 1.365, etc." maxlength="255">
                     </div>
                     <div class="form-group">
                         <label for="edit_capacity">Capacity</label>
@@ -437,11 +461,15 @@ $sections_result = $conn->query($sections_query);
                     </div>
                     <div class="form-group">
                         <label for="edit_start_time">Start Time</label>
-                        <input type="time" id="edit_start_time" name="start_time">
+                        <select id="edit_start_time" name="start_time">
+                            <?php echo getTimeOptions(); ?>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="edit_end_time">End Time</label>
-                        <input type="time" id="edit_end_time" name="end_time">
+                        <select id="edit_end_time" name="end_time">
+                            <?php echo getTimeOptions(); ?>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="edit_start_date">Start Date</label>
