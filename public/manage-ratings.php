@@ -1,13 +1,9 @@
 <?php
-session_start();
-// Check if admin is logged in
+require_once 'admin-functions.php';
+require_once 'db.php';
 
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header('Location: admin-login.php');
-    exit();
-}
-
-include('db.php');
+requireAdminAuth();
+handleLogout();
 
 $message = '';
 $message_type = '';
@@ -96,9 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'
                         }
                         fflush($out);
                         flock($out, LOCK_UN);
-                        $message = "Imported {$imported} row(s)" 
-                                 . ($skipped ? " ({$skipped} skipped)" : "")
-                                 . " successfully.";
+                        $message = getCSVImportMessage($imported, $skipped, 'ratings');
                         $message_type = 'success';
                     } else {
                         $message = 'Could not lock Rating.csv.';
