@@ -23,7 +23,8 @@
                 <input type="text" id="search" name="search" maxlength="100"
                        placeholder="Search by course number, course name, or instructor..."
                        value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>"
-                       title="Search by course number, course name, or instructor...">
+                       pattern="[A-Za-z0-9\s]{2,100}"
+                       title="Only letters, numbers, and spaces are allowed (2–100 characters)">
                 <button type="submit">Search</button>
                 <button type="button" class="clear-btn" onclick="clearForm()">Clear</button>
             </div>
@@ -36,6 +37,16 @@
 
                 $search_term = strtoupper(trim($_GET['search']));
                 $search_pattern = '%' . $search_term . '%';
+
+                // Validate length
+                if (strlen($search_term) < 2 || strlen($search_term) > 100) {
+                    die ('<div class="no-results">Search term must be between 2 and 100 characters.</div>');
+                }
+
+                // Validate allowed characters
+                if (!preg_match('/^[A-Za-z0-9\s]+$/', $search_term)) {
+                    die ('<div class="no-results">Invalid characters in search term. Use only letters, numbers, and spaces.</div>');
+                }
 
                 // Normalize input and determine search type
                 if (preg_match('/^[A-Z]{2,4}$/', $search_term)) {

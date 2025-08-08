@@ -17,6 +17,12 @@
             $numbers = $conn->query("SELECT DISTINCT course_number FROM course ORDER BY course_number")->fetch_all(MYSQLI_ASSOC);
             $instructors = $conn->query("SELECT DISTINCT instructor_name FROM instructor ORDER BY instructor_name")->fetch_all(MYSQLI_ASSOC);
             $terms = $conn->query("SELECT DISTINCT term FROM section ORDER BY term")->fetch_all(MYSQLI_ASSOC);
+
+            // Convert to plain arrays for validation
+            $allowed_prefixes = array_column($prefixes, 'course_prefix');
+            $allowed_numbers = array_column($numbers, 'course_number');
+            $allowed_instructors = array_column($instructors, 'instructor_name');
+            $allowed_terms = array_column($terms, 'term');
         ?>
 
         <div class="container">
@@ -90,6 +96,22 @@
             <?php
             if ($_GET) {
                 echo '<h2>Search Results</h2>';
+
+                if (!empty($_GET['course_prefix']) && !in_array($_GET['course_prefix'], $allowed_prefixes, true)) {
+                    die('<div class="no-results">Invalid search criteria.</div>');
+                }
+
+                if (!empty($_GET['course_number']) && !in_array($_GET['course_number'], $allowed_numbers, true)) {
+                    die('<div class="no-results">Invalid search criteria.</div>');
+                }
+
+                if (!empty($_GET['instructor_name']) && !in_array($_GET['instructor_name'], $allowed_instructors, true)) {
+                    die('<div class="no-results">Invalid search criteria.</div>');
+                }
+
+                if (!empty($_GET['term']) && !in_array($_GET['term'], $allowed_terms, true)) {
+                    die('<div class="no-results">Invalid search criteria.</div>');
+                }
 
                 $where = [];
                 $params = [];
