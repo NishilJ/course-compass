@@ -1,18 +1,9 @@
 <?php
-session_start();
+require_once 'admin-functions.php';
+require_once 'db.php';
 
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header('Location: admin-login.php');
-    exit();
-}
-
-include('db.php');
-
-if (isset($_GET['logout'])) {
-    session_destroy();
-    header('Location: admin-login.php');
-    exit();
-}
+requireAdminAuth();
+handleLogout();
 
 // Get statistics
 $stats = [
