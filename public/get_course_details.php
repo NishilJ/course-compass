@@ -177,10 +177,15 @@ if (isset($_GET['course_id'])) {
                                     $courses_stmt->execute();
                                     $courses_result = $courses_stmt->get_result();
                                     if ($courses_result->num_rows > 0) {
+                                        $results = [];
                                         while ($taught = $courses_result->fetch_assoc()) {
-                                            echo htmlspecialchars($taught['course_code']) . ' - ' . htmlspecialchars($taught['course_title']);
+                                            $results[] = htmlspecialchars($taught['course_code']) . ' - ' . htmlspecialchars($taught['course_title']);
+                                        }
+                                        if (!empty($results)) {
+                                            echo implode(', ', $results);
                                         }
                                     }
+
                                     $courses_stmt->close();
                                 }
                                 ?>
