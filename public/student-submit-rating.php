@@ -11,10 +11,10 @@ $message_type = '';
 try {
     $stmt = $conn->prepare("
         SELECT
-          `COL 1` AS instructor_id,
-          `COL 2` AS instructor_name
+          instructor_id,
+          instructor_name
         FROM `instructor`
-        ORDER BY `COL 2`
+        ORDER BY instructor_name
     ");
     $stmt->execute();
     $stmt->bind_result($instr_id, $instr_name);
@@ -39,25 +39,30 @@ foreach ($instructors as $id => $name) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $instructor_id = $_POST['instructor_id']      ?? '';
     $rating_number = intval($_POST['rating_number'] ?? 0);
-    $student_grade = $_POST['student_grade']      ?? '';
+    $rating_student_grade = $_POST['rating_student_grade']      ?? '';
 
+    if ($rating_student_grade === '') {
+        $rating_student_grade = null;
+    }
+    
+    $instructor_id = (int)($_POST['instructor_id'] ?? 0);
     if (! isset($instructors[$instructor_id])) {
         $message = 'Please select a valid instructor.';
         $message_type = 'error';
     } elseif ($rating_number < 1 || $rating_number > 5) {
         $message = 'Please select a rating between 1 and 5.';
         $message_type = 'error';
-    } elseif (! in_array($student_grade, ['A','B','C','D','F','N/A'], true)) {
+    } elseif (! in_array($rating_student_grade, ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', null], true)) {
         $message = 'Please select a valid grade.';
         $message_type = 'error';
     } else {
         try {
             $ins = $conn->prepare("
                 INSERT INTO `rating`
-                  (`COL 2`,`COL 3`,`COL 4`)
+                  (instructor_id, rating_number, rating_student_grade)
                 VALUES (?,?,?)
             ");
-            $ins->bind_param("iis", $instructor_id, $rating_number, $student_grade);
+            $ins->bind_param("iis", $instructor_id, $rating_number, $rating_student_grade);
             $ins->execute();
             $ins->close();
             $message = 'Rating submitted successfully.';
@@ -72,11 +77,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 try {
     $stat = $conn->prepare("
         SELECT
-          `COL 2` AS instructor_id,
-          `COL 3` AS rating_number,
+          instructor_id,
+          rating_number,
           COUNT(*) AS cnt
         FROM `rating`
-        GROUP BY `COL 2`, `COL 3`
+        GROUP BY instructor_id, rating_number
     ");
     $stat->execute();
     $stat->bind_result($iid, $rnum, $cnt);
@@ -139,7 +144,7 @@ try {
               <option value="">-- Select Instructor --</option>
               <?php foreach ($instructors as $id => $name): ?>
                 <option value="<?php echo htmlspecialchars($id); ?>"
-                  <?php if (($_POST['instructor_id'] ?? '') === $id) echo 'selected'; ?>>
+                  <?php if (($_POST['instructor_id'] ?? '') == $id) echo 'selected'; ?>>
                   <?php echo htmlspecialchars($name); ?>
                 </option>
               <?php endforeach; ?>
@@ -160,12 +165,12 @@ try {
           </div>
 
           <div class="form-group">
-            <label for="student_grade">Your Grade</label>
-            <select name="student_grade" id="student_grade" required>
-              <option value="">Select grade</option>
-              <?php foreach (['A','B','C','D','F','N/A'] as $g): ?>
+            <label for="rating_student_grade">Your Grade</label>
+            <select name="rating_student_grade" id="rating_student_grade" required>
+                <option value="">N/A</option>
+              <?php foreach (['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'] as $g): ?>
                 <option value="<?php echo $g; ?>"
-                  <?php if (($_POST['student_grade'] ?? '') === $g) echo 'selected'; ?>>
+                  <?php if (($_POST['rating_student_grade'] ?? '') === $g) echo 'selected'; ?>>
                   <?php echo $g; ?>
                 </option>
               <?php endforeach; ?>

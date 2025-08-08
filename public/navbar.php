@@ -15,10 +15,11 @@
             <div class="dropdown-content">
                 <a href="index.php">Home</a>
                 <a href="admin-dashboard.php">Admin</a>
-                <a href="as6/select-injection.php">Assignment 6 Demo</a>
+                <a href="student-submit-rating.php">Ratings</a>
                 <?php if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true): ?>
                     <a href="?logout=1">Log Out</a>
-                <?php endif ?>    
+                <?php endif ?>
+                <a href="as6/select-injection.php">Assignment 6</a>
             </div>
         </div>
     </div>
