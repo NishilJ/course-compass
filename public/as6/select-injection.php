@@ -5,7 +5,7 @@ include('navbar.php');
 $username = $password = "";
 $sql = "";
 $results = null;
-$message = "Please submit the form.";
+$message = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['username'], $_POST['password'])) {
     $username = $_POST['username'];
@@ -43,8 +43,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['username'], $_POST['p
         <input type="submit" value="Login">
     </form>
 
-    <p><strong>Try SQL Injection:</strong><br>
-       Username: <code>' OR '1'='1' --  =</code><br>
+    <p> <br>
+       Username: <code>' OR '1'='1' -- </code><br>
        Password: <code>anything</code>
     </p>
 

@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['username'], $_POST['p
     <title>Safe Login - Prepared Statements</title>
 </head>
 <body>
-    <h2>Safe Login Form (with Prepared Statements)</h2>
+     
 
     <form method="post" action="">
         <label for="username">Username:</label><br>
@@ -59,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['username'], $_POST['p
     <?php endif; ?>
 
     <hr>
-    <h3>Try SQL Injection Now:</h3>
+     
     <p><code>' OR '1'='1</code> in the username or password field will NOT work here!</p>
 </body>
 </html>

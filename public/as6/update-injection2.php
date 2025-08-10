@@ -58,8 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['username'], $_POST['o
     <?php endif; ?>
 
     <hr>
-    <h3>Try SQL Injection!</h3>
-    <p>For example, try injecting in the <b>old password</b> field to bypass the check:</p>
+
     <ul>
         <li>Username: <code>1</code></li>
         <li>Old Password: <code>' OR '1'='1</code></li>

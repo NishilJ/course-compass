@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $instructors = [];
 
 // First get all instructors
-$result = $conn->query("SELECT instructor_id, instructor_name FROM Instructor ORDER BY instructor_name");
+$result = $conn->query("SELECT instructor_id, instructor_name FROM instructor ORDER BY instructor_name");
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $instructors[$row['instructor_id']] = [
@@ -107,7 +107,7 @@ if ($result && $result->num_rows > 0) {
 }
 
 // Then get ratings data
-$result = $conn->query("SELECT instructor_id, rating_number FROM Rating WHERE rating_number BETWEEN 1 AND 5");
+$result = $conn->query("SELECT instructor_id, rating_number FROM rating WHERE rating_number BETWEEN 1 AND 5");
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $instructor_id = $row['instructor_id'];

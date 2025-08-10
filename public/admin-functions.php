@@ -13,7 +13,7 @@ function requireAdminAuth() {
     }
 }
 
-// Handle logout
+// Handle logout #
 function handleLogout() {
     if (isset($_GET['logout'])) {
         session_destroy();
